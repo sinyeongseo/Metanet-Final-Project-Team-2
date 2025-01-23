@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "../mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.myapp.board.dao.IBoardRepository">
+	<insert id="insertFileData" parameterType="com.example.myapp.board.model.BoardUploadFile">
+	<![CDATA[
+		INSERT INTO board_upload_file 
+			(file_id, board_id, file_name, file_size, file_content_type, file_data) 
+		VALUES 
+			(#{fileId}, #{boardId}, #{fileName}, #{fileSize}, #{fileContentType}, #{fileData})
+	]]>
+	</insert>
+	
+	<select id="getFile" parameterType="int" resultType="com.example.myapp.board.model.BoardUploadFile">
+	<![CDATA[
+		SELECT 
+			file_id				AS "fileId", 
+			board_id			AS "boardId", 
+			file_name			AS "fileName", 
+			file_size			AS "fileSize", 
+			file_content_type	AS "fileContentType", 
+			file_data 			AS "fileData"
+		FROM board_upload_file 
+		WHERE file_id=#{fileId}
+	]]>
+	</select>
+	
+	<update id="updateArticle" parameterType="com.example.myapp.board.model.Board">
+	<![CDATA[
+		UPDATE board 
+		SET 
+			category_id=#{categoryId}, writer=#{writer}, 
+			email=#{email}, title=#{title}, 
+			content=#{content}, write_date=SYSDATE 
+		WHERE board_id=#{boardId}
+	]]>
+	</update>
+
+	<delete id="deleteReplyFileData" parameterType="int">
+	<![CDATA[
+		DELETE FROM board_upload_file 
+		WHERE EXISTS (SELECT board_id FROM board  
+					  WHERE board.master_id=#{boardId} 
+					  AND board.board_id=board_upload_file.board_id)
+	]]>
+	</delete>
+
+	<delete id="deleteArticleByBoardId" parameterType="int">
+		DELETE FROM board 
+		WHERE board_id=#{boardId}
+	</delete>
+
+</mapper>
