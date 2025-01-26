@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 public class S3Images {
-    private long imageId;       
+    private Long imageId;       
     private String imageUrl;
     private Date imageCreated;
     private Date imageUpdated;
