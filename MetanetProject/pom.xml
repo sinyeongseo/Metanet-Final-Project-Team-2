@@ -121,7 +121,35 @@
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-xml</artifactId>
 		</dependency>
+		
+	    <!-- Spring Boot Starter Mail -->
+	    <dependency>
+	        <groupId>org.springframework.boot</groupId>
+	        <artifactId>spring-boot-starter-mail</artifactId>
+	    </dependency>
 	
+	    <!-- Jakarta Mail API (JavaMail) -->
+	    <dependency>
+	        <groupId>org.eclipse.angus</groupId>
+	        <artifactId>angus-mail</artifactId>
+	    </dependency>
+	
+	    <!-- Spring Data Redis -->
+	    <dependency>
+	        <groupId>org.springframework.boot</groupId>
+	        <artifactId>spring-boot-starter-data-redis</artifactId>
+	    </dependency>
+	
+		<!-- https://mvnrepository.com/artifact/io.lettuce/lettuce-core -->
+		<dependency>
+		    <groupId>io.lettuce</groupId>
+		    <artifactId>lettuce-core</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>ognl</groupId>
+		    <artifactId>ognl</artifactId>
+		    <version>3.2.21</version>
+		</dependency>
 	</dependencies>
 
 	<build>
