@@ -3,7 +3,11 @@ package com.example.myapp.member.service;
 import java.util.List;
 import java.util.Random;
 
+import com.example.myapp.common.response.ResponseCode;
+import com.example.myapp.common.response.ResponseDto;
+import com.example.myapp.common.response.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
@@ -109,29 +113,52 @@ public class MemberService implements IMemberService {
 
         return message;
     }
-    
-	// 인증코드 이메일 발송
+
 	@Override
-	public void sendEmail(String email) throws MessagingException {
-		log.info(email);
-		if (redisUtil.existData(email)) {
-	        redisUtil.deleteData(email);
-	    }
-	    // 이메일 폼 생성
-	    MimeMessage emailForm = createEmailForm(email);
-	    // 이메일 발송
-	    javaMailSender.send(emailForm);	
+	public ResponseEntity<ResponseDto> sendEmail(String email) {
+		try {
+			if (redisUtil.existData(email)) {
+				redisUtil.deleteData(email);
+			}
+		} catch (Exception e) {
+			return ResponseDto.redisError();
+		}
+
+		try {
+			MimeMessage emailForm = createEmailForm(email);
+			javaMailSender.send(emailForm);
+		} catch (MessagingException e) {
+			return ResponseDto.mailSendFail();
+		}
+
+		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+		return ResponseEntity.ok(responseBody);
 	}
 
-	// 코드 검증
+
 	@Override
-	public boolean verifyEmailCode(String email, String code) {
-		String codeFoundByEmail = redisUtil.getData(email);
-        log.info("code found by email: " + codeFoundByEmail);
-        if (codeFoundByEmail == null) {
-            return false;
-        }
-        return codeFoundByEmail.equals(code);
+	public ResponseEntity<ResponseDto> verifyEmailCode(String email, String code) {
+		try {
+			String codeFoundByEmail = redisUtil.getData(email);
+
+			// 이메일 코드가 없을 경우
+			if (codeFoundByEmail == null) {
+				return ResponseDto.notExistEmail();
+			}
+
+			// 코드가 일치하지 않는 경우
+			if (!codeFoundByEmail.equals(code)) {
+				return ResponseDto.certificateFail();
+			}
+
+			// 코드가 일치하는 경우
+			ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+			return ResponseEntity.ok(responseBody);
+
+		} catch (Exception e) {
+			return ResponseDto.serverError();
+		}
 	}
+
 
 }
