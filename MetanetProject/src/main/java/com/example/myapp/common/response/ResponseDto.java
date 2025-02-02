@@ -1,20 +1,30 @@
 package com.example.myapp.common.response;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @Getter
-@AllArgsConstructor
-public class ResponseDto {
+@NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ResponseDto<T> {
 
     private String code;
     private String message;
+    private T data;
 
-    public ResponseDto() {
-        this.code = ResponseCode.SUCCESS;
-        this.message = ResponseMessage.SUCCESS;
+    public ResponseDto(String code, String message) {
+        this.code = code;
+        this.message = message;
+        this.data = null;
+    }
+
+    public ResponseDto(String code, String message, T data) {
+        this.code = code;
+        this.message = message;
+        this.data = data;
     }
 
     // HTTP Status 400
