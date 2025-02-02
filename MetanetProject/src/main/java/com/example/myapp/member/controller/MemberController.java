@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-@RestController
+//@RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class MemberController {
@@ -50,7 +50,7 @@ public class MemberController {
 		binder.setValidator(memberValidator);
 	}
 	
-	@GetMapping(value="/member/insert")
+	@PostMapping(value="/member/insert")
 	public String insertMember(HttpSession session, Model model) {
 		String csrfToken = UUID.randomUUID().toString();
         session.setAttribute("csrfToken", csrfToken);
@@ -80,7 +80,7 @@ public class MemberController {
 			member.setPassword(encodedPw);
 			memberService.insertMember(member);
 		}catch(DuplicateKeyException e) {
-			member.setUserid(null);
+			member.setId(null);
 			model.addAttribute("member", member);
 			model.addAttribute("message", "ID_ALREADY_EXIST");
 			return "member/form";
@@ -181,9 +181,9 @@ public class MemberController {
 	public String deleteMember(String password, Principal principal, Model model) {
 		try {
 			Member member = new Member();
-			member.setUserid(principal.getName());
+			member.setId(principal.getName());
 //			member.setUserid((String)session.getAttribute("userid"));
-			String dbpw = memberService.getPassword(member.getUserid());
+			String dbpw = memberService.getPassword(member.getId());
 			if(password != null && passwordEncoder.matches(password, dbpw)) {
 				member.setPassword(dbpw);
 				memberService.deleteMember(member);
