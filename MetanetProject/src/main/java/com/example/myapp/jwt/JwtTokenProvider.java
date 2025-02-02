@@ -49,7 +49,7 @@ public class JwtTokenProvider {
 	public String generateToken(Member member) {
 		long now = System.currentTimeMillis();
 		Claims claims = Jwts.claims()
-				.subject(member.getUserid()) 	// sub
+				.subject(member.getId()) 	// sub
 				.issuer(member.getName()) 		// iss
 				.issuedAt(new Date(now)) 		// iat
 				.expiration(new Date(now + tokenValidTime)) // exp

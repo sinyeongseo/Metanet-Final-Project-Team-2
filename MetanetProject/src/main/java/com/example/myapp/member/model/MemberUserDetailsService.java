@@ -28,7 +28,7 @@ public class MemberUserDetailsService implements UserDetailsService {
 		List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roles);
 
 		//return new User(memberInfo.getUserid(), "{noop}"+memberInfo.getPassword(), authorities);
-		return new MemberUserDetails(memberInfo.getUserid(),
+		return new MemberUserDetails(memberInfo.getId(),
 				memberInfo.getPassword(), authorities,
 				memberInfo.getEmail());
 	}
