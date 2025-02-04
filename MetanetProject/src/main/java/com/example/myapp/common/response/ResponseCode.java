@@ -10,6 +10,8 @@ public interface ResponseCode {
     String DUPLICATE_EMAIL = "DE";
     String DUPLICATE_ID = "DI";
     String VALIDATION_FAILED = "VF";
+    String NOT_SAME_PW="NSP";
+    String NULL_INTPUT_VALUE ="NIV";
 
     // HTTP Status 401
     String SIGN_IN_FAILED = "SF";

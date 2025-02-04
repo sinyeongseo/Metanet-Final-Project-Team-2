@@ -7,9 +7,9 @@
 	<insert id="insertMember" parameterType="com.example.myapp.member.model.Member">
 	<![CDATA[
 		INSERT INTO 
-			member (userid, name, password, phone, email) 
+			members (id, name, password, phone, email, role, deleted, birth, profile, bank) 
 		VALUES 
-			(#{userid}, #{name}, #{password}, #{phone}, #{email})
+			(#{id}, #{name}, #{password}, #{phone}, #{email}, #{role}, 0, #{birth}, #{profile}, #{bank})
 	]]>
 	</insert>
 

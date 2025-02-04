@@ -26,6 +26,13 @@ public class ResponseDto<T> {
         this.message = message;
         this.data = data;
     }
+    
+    // 200
+    public static ResponseEntity<ResponseDto> success() {
+    	ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+    	return ResponseEntity.ok(responseBody);
+    	
+    }
 
     // HTTP Status 400
     public static ResponseEntity<ResponseDto> notExistUser() {
@@ -51,6 +58,16 @@ public class ResponseDto<T> {
     public static ResponseEntity<ResponseDto> validationFail() {
         ResponseDto responseBody = new ResponseDto(ResponseCode.VALIDATION_FAILED, ResponseMessage.VALIDATION_FAILED);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+    }
+
+    public static ResponseEntity<ResponseDto> notSamePassword() {
+    	ResponseDto responseBody = new ResponseDto(ResponseCode.NOT_SAME_PW, ResponseMessage.NOT_SAME_PW);
+    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+    }
+    
+    public static ResponseEntity<ResponseDto> nullInputValue() {
+    	ResponseDto responseBody = new ResponseDto(ResponseCode.NULL_INTPUT_VALUE, ResponseMessage.NULL_INTPUT_VALUE);
+    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
 
     // HTTP Status 401
