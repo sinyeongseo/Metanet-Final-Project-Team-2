@@ -1,5 +1,7 @@
 package com.example.myapp.member.model;
 
+import java.util.Date;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -8,15 +10,15 @@ import lombok.ToString;
 @ToString
 public class Member {
 	
+	private String profile;
     private String id;
-	private String name;
 	private String password;
-	private String password2;
 	private String phone;
 	private String email;	
+	private Date birth;
+	private String name;
     private String role;
-    private int deleted;
-    private String car;
-    private int alarm_status;
+    private String bank;
+    private int deleted;        
    
 }
