@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.myapp.common.response.ResponseDto;
-import com.example.myapp.jwt.SecurityUtil;
 import com.example.myapp.jwt.model.JwtToken;
 import com.example.myapp.member.model.Member;
 import com.example.myapp.member.service.IMemberService;
+import com.example.myapp.util.RegexUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,21 +32,46 @@ public class AuthRestController {
 	// 회원가입
 	@PostMapping("/join")
 	public ResponseEntity<ResponseDto> join(@RequestBody Member member) {
-		try {
-			if (member.getRole().equals("teacher")) {
-				if (member.getBank().isEmpty()) {
-					return ResponseDto.nullInputValue();
-				}
-			}
-			String encodedPw = passwordEncoder.encode(member.getPassword());
-			member.setPassword(encodedPw);
-			memberService.insertMember(member);
-		} catch (DuplicateKeyException e) {
-			member.setId(null);
-			return ResponseDto.duplicatedId();
-		}
-		return ResponseDto.success();
+	    try {
+	        // 전화번호 검증
+	        RegexUtil regexUtil = new RegexUtil();
+	        
+	        if (member.getPhone() != null && !regexUtil.telNumber(member.getPhone())) {
+	           return ResponseEntity.badRequest().body(new ResponseDto("REGEX_ERROR", "Phone value not match Regex"));
+	        }
+
+	        // 이메일 검증
+	        if (member.getEmail() != null && !regexUtil.checkEmail(member.getEmail())) {
+	        	return ResponseEntity.badRequest().body(new ResponseDto("REGEX_ERROR", "Email value not match Regex"));
+	        }
+
+	        // 비밀번호 검증
+	        if (member.getPassword() != null && !regexUtil.checkPassword(member.getPassword())) {
+	        	return ResponseEntity.badRequest().body(new ResponseDto("REGEX_ERROR", "Password value not match Regex"));
+	        }
+
+	        // 역할이 teacher일 경우 은행 계좌 정보 검증
+	        if (member.getRole().equals("teacher")) {
+	            if (member.getBank().isEmpty()) {
+	                return ResponseDto.nullInputValue(); // 은행 계좌 입력 값 없음
+	            }
+	        }
+
+	        // 비밀번호 암호화
+	        String encodedPw = passwordEncoder.encode(member.getPassword());
+	        member.setPassword(encodedPw);
+
+	        // 회원 정보 저장
+	        memberService.insertMember(member);
+
+	    } catch (DuplicateKeyException e) {
+	        member.setId(null);
+	        return ResponseDto.duplicatedId(); // ID 중복 오류
+	    }
+
+	    return ResponseDto.success(); // 회원가입 성공
 	}
+
 
 	@PostMapping("/login")
 	public ResponseEntity<Void> login(@RequestBody Member member) {
