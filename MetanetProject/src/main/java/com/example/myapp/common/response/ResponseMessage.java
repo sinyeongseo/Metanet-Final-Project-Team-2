@@ -12,6 +12,7 @@ public interface ResponseMessage {
     String VALIDATION_FAILED = "validation failed";
     String NOT_SAME_PW = "not same password and password1";
     String NULL_INTPUT_VALUE ="null input value";
+
     // HTTP Status 401
     String SIGN_IN_FAILED = "Login information mismatch.";
     String CERTIFICATE_FAIL = "certification failed";

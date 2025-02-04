@@ -12,6 +12,7 @@ public interface ResponseCode {
     String VALIDATION_FAILED = "VF";
     String NOT_SAME_PW="NSP";
     String NULL_INTPUT_VALUE ="NIV";
+
     // HTTP Status 401
     String SIGN_IN_FAILED = "SF";
     String CERTIFICATE_FAIL = "CF";
@@ -27,6 +28,4 @@ public interface ResponseCode {
     String REDIS_ERROR = "RE";
     String DATABASE_ERROR = "DBE";
     String SERVER_ERROR = "SE";
-    
-    
 }

@@ -69,7 +69,7 @@ public class ResponseDto<T> {
     	ResponseDto responseBody = new ResponseDto(ResponseCode.NULL_INTPUT_VALUE, ResponseMessage.NULL_INTPUT_VALUE);
     	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
-    
+
     // HTTP Status 401
     public static ResponseEntity<ResponseDto> signInFail() {
         ResponseDto responseBody = new ResponseDto(ResponseCode.SIGN_IN_FAILED, ResponseMessage.SIGN_IN_FAILED);
