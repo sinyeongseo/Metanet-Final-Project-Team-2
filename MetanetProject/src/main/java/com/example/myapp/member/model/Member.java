@@ -10,6 +10,7 @@ import lombok.ToString;
 @ToString
 public class Member {
 	
+	private String profile;
     private String id;
 	private String password;
 	private String password2;
@@ -19,7 +20,6 @@ public class Member {
 	private String name;
     private String role;
     private String bank;
-    private int deleted;    
-    private int alarm_status;
+    private int deleted;        
    
 }
