@@ -19,4 +19,10 @@ public interface IMemberRepository {
 	Member selectMember(String userid);
 	
 	Optional<Member> findById(String id);
+	
+	int findByEmail(String email);
+	
+	String getUserIdByEmail(String email);
+	
+	void setNewPw(String email, String password);
 }

@@ -35,6 +35,7 @@ public class SecurityConfig {
 	    http.authorizeHttpRequests(auth -> auth
 	            .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
 	            .requestMatchers("/auth/**").permitAll()
+	            .requestMatchers("/email/**").permitAll()
 	            //.requestMatchers("/board/test").hasAnyRole("User", "Teacher")
 	            .anyRequest().authenticated()  // 모든 요청은 인증이 필요
 	    );

@@ -25,4 +25,12 @@
 	]]>
 	</select>
 	
+	<select id="findByEmail" resultType="int">
+		SELECT COUNT(*) FROM members WHERE email = #{email}	
+	</select>
+	
+	<update id="setNewPw">
+		UPDATE members SET password = #{password} WHERE email = #{email}  		
+	</update>
+	
 </mapper>

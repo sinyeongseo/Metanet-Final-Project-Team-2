@@ -24,10 +24,10 @@ public class EmailController {
 	@Autowired
 	IMemberService memberService;
 
-	// 인증코드 메일 발송
+	// 회원가입 인증코드 메일 발송
 	@PostMapping("/send")
 	public ResponseEntity<ResponseDto> mailSend(@RequestBody Email email) throws MessagingException {
-		ResponseEntity<ResponseDto> response = memberService.sendEmail(email.getEmail());
+		ResponseEntity<ResponseDto> response = memberService.sendEmail("join", email.getEmail());
 		return response;
 	}
 	
@@ -37,4 +37,27 @@ public class EmailController {
 		ResponseEntity<ResponseDto> response = memberService.verifyEmailCode(email.getEmail(), email.getVerifyCode());
 		return response;
 	}
+	
+
+	// pw 인증번호
+	@PostMapping("/mail-password")
+	public ResponseEntity<ResponseDto> mailPw(@RequestBody Email email) throws MessagingException{		
+		
+		if( memberService.findByEmail(email.getEmail()) == false) {						
+			return ResponseDto.notExistEmail();
+		}		
+				
+		ResponseEntity<ResponseDto> response = memberService.sendEmail("password", email.getEmail());
+				
+		
+		return response;	
+	}
+	
+	@PostMapping("/password-verify")
+	public ResponseEntity<ResponseDto> pwVerify(@RequestBody Email email) {		
+		
+		ResponseEntity<ResponseDto> response = memberService.verifyPwCode(email.getEmail(), email.getVerifyCode());
+		return response;
+	}
+	
 }
