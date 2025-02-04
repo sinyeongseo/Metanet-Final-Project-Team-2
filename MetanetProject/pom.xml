@@ -99,11 +99,32 @@
 			<scope>test</scope>
 		</dependency>
 		
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt</artifactId>
-			<version>0.12.6</version>
-		</dependency>
+		<!-- jjwt-api 의존성 -->
+		<!--JWT를 생성하고 검증하는데 필요함-->
+	    <dependency>
+	        <groupId>io.jsonwebtoken</groupId>
+	        <artifactId>jjwt-api</artifactId>
+	        <version>0.11.5</version>
+	    </dependency>
+	
+	    <!-- jjwt-impl 의존성 (런타임 시 필요) -->
+	    <!--실제 JWT 처리를 위한 구현체-->
+	    <dependency>
+	        <groupId>io.jsonwebtoken</groupId>
+	        <artifactId>jjwt-impl</artifactId>
+	        <version>0.11.5</version>
+	        <scope>runtime</scope>
+	    </dependency>
+	
+	    <!-- jjwt-jackson 의존성 (런타임 시 필요) -->
+	    <!-- JSON처리를 위한 라이브러리-->
+	    <dependency>
+	        <groupId>io.jsonwebtoken</groupId>
+	        <artifactId>jjwt-jackson</artifactId>
+	        <version>0.11.5</version>
+	        <scope>runtime</scope>
+	    </dependency>
+	    
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-aop</artifactId>

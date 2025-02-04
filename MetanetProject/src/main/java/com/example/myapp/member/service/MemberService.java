@@ -1,16 +1,27 @@
 package com.example.myapp.member.service;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
+import com.example.myapp.common.response.ResponseCode;
+import com.example.myapp.common.response.ResponseDto;
+import com.example.myapp.common.response.ResponseMessage;
+import com.example.myapp.jwt.JwtTokenProvider;
+import com.example.myapp.jwt.model.JwtToken;
+import com.example.myapp.jwt.model.RefreshToken;
+import com.example.myapp.jwt.service.RedisTokenService;
 import com.example.myapp.member.dao.IMemberRepository;
 import com.example.myapp.member.model.Member;
 import com.example.myapp.util.RedisUtil;
@@ -30,6 +41,13 @@ public class MemberService implements IMemberService {
 	private final RedisUtil redisUtil;
 	private static final String senderEmail = "neighclova@gmail.com";
 	
+	private final AuthenticationManagerBuilder authenticationManagerBuilder;
+	private final JwtTokenProvider jwtTokenProvider;
+	
+	@Autowired
+    private final RedisTokenService redisTokenService;
+
+	
 	@Autowired
 	IMemberRepository memberDao;
 	
@@ -38,29 +56,10 @@ public class MemberService implements IMemberService {
 		memberDao.insertMember(member);
 	}
 
+	// id 값으로 member 객체 여부 확인
 	@Override
-	public Member selectMember(String userid) {
-		return memberDao.selectMember(userid);
-	}
-
-	@Override
-	public List<Member> selectAllMembers() {
-		return memberDao.selectAllMembers();
-	}
-
-	@Override
-	public void updateMember(Member member) {
-		memberDao.updateMember(member);
-	}
-
-	@Override
-	public void deleteMember(Member member) {
-		memberDao.deleteMember(member);
-	}
-
-	@Override
-	public String getPassword(String userid) {
-		return memberDao.getPassword(userid);
+	public Optional<Member> findById(String id) {
+		return memberDao.findById(id);
 	}
 	
     private String createCode() {
@@ -109,29 +108,80 @@ public class MemberService implements IMemberService {
 
         return message;
     }
-    
-	// 인증코드 이메일 발송
+
 	@Override
-	public void sendEmail(String email) throws MessagingException {
-		log.info(email);
-		if (redisUtil.existData(email)) {
-	        redisUtil.deleteData(email);
-	    }
-	    // 이메일 폼 생성
-	    MimeMessage emailForm = createEmailForm(email);
-	    // 이메일 발송
-	    javaMailSender.send(emailForm);	
+	public ResponseEntity<ResponseDto> sendEmail(String email) {
+		try {
+			if (redisUtil.existData(email)) {
+				redisUtil.deleteData(email);
+			}
+		} catch (Exception e) {
+			return ResponseDto.redisError();
+		}
+
+		try {
+			MimeMessage emailForm = createEmailForm(email);
+			javaMailSender.send(emailForm);
+		} catch (MessagingException e) {
+			return ResponseDto.mailSendFail();
+		}
+
+		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+		return ResponseEntity.ok(responseBody);
 	}
 
-	// 코드 검증
+
 	@Override
-	public boolean verifyEmailCode(String email, String code) {
-		String codeFoundByEmail = redisUtil.getData(email);
-        log.info("code found by email: " + codeFoundByEmail);
-        if (codeFoundByEmail == null) {
-            return false;
-        }
-        return codeFoundByEmail.equals(code);
+	public ResponseEntity<ResponseDto> verifyEmailCode(String email, String code) {
+		try {
+			String codeFoundByEmail = redisUtil.getData(email);
+
+			// 이메일 코드가 없을 경우
+			if (codeFoundByEmail == null) {
+				return ResponseDto.notExistEmail();
+			}
+
+			// 코드가 일치하지 않는 경우
+			if (!codeFoundByEmail.equals(code)) {
+				return ResponseDto.certificateFail();
+			}
+
+			// 코드가 일치하는 경우
+			ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+			return ResponseEntity.ok(responseBody);
+
+		} catch (Exception e) {
+			return ResponseDto.serverError();
+		}
 	}
+	
+	@Override
+	public JwtToken loginService(Member member) {
+		// 1. ID + password 를 기반으로 Authentication 객체 생성
+		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member.getId(), member.getPassword());
+
+		// 2. 실제 검증. authenticate() 메서드를 통해 요청된 Member 에 대한 검증 진행
+		Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+		
+        // 3. 인증 정보를 기반으로 JWT 토큰 생성
+        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);        
+        
+        
+        //4. 리프레시 토큰 redis에 저장
+        String refreshToken = jwtToken.getRefreshToken(); // 리프레시 토큰        
+        String userId = member.getId(); // 사용자 ID
+        RefreshToken refreshTokenObj = new RefreshToken(refreshToken, userId);
+        
+        // 5. Redis에 리프레시 토큰 저장       
+        redisTokenService.saveRefreshToken(userId, refreshTokenObj);        
+        		
+        return jwtToken;
+	}
+
+
+
+	
+
+
 
 }

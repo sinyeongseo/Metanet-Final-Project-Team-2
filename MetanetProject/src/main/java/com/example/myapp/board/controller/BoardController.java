@@ -28,7 +28,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.myapp.board.model.Board;
 import com.example.myapp.board.model.BoardCategory;
 import com.example.myapp.board.model.BoardUploadFile;
-import com.example.myapp.board.model.S3Images;
 import com.example.myapp.board.service.IBoardCategoryService;
 import com.example.myapp.board.service.IBoardService;
 
@@ -318,7 +317,7 @@ public class BoardController {
 		}
 		return "board/search";
 	}
-
+		
 	@ExceptionHandler({RuntimeException.class})
 	public String error(HttpServletRequest request, Exception ex, Model model) {
 		model.addAttribute("exception", ex);
@@ -326,4 +325,6 @@ public class BoardController {
 		model.addAttribute("url", request.getRequestURI());
 		return "error/runtime";
 	}
+	
+	
 }
