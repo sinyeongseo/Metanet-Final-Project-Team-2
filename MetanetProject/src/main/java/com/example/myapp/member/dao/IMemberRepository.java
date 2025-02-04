@@ -1,6 +1,7 @@
 package com.example.myapp.member.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
@@ -16,8 +17,6 @@ public interface IMemberRepository {
 	
 	void insertMember(Member member) ;
 	Member selectMember(String userid);
-	List<Member> selectAllMembers();
-	void updateMember(Member member);
-	void deleteMember(Member member);
-	String getPassword(String userid);
+	
+	Optional<Member> findById(String id);
 }

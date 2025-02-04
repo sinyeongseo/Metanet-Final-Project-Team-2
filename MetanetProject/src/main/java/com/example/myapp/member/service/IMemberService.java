@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.example.myapp.common.response.ResponseDto;
+import com.example.myapp.jwt.model.JwtToken;
 import com.example.myapp.member.model.Member;
 
 import jakarta.mail.MessagingException;
@@ -20,14 +21,9 @@ public interface IMemberService {
 	void insertMember(Member member) ;
 	
 	//로그인
-	//LoginResponseDto login(Member member);
+	JwtToken loginService(Member member);
 	
 	//id로 조회하기
-	//<Member> findById(String id);
+	Optional<Member> findById(String id);
 	
-	Member selectMember(String userid);
-	List<Member> selectAllMembers();
-	void updateMember(Member member);
-	void deleteMember(Member member);
-	String getPassword(String userid);
 }
