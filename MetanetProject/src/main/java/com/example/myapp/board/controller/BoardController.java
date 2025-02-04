@@ -317,12 +317,7 @@ public class BoardController {
 		}
 		return "board/search";
 	}
-	
-	@PostMapping("/board/test")
-	public String test(){ 
-		return "TEST 완료";
-	}
-
+		
 	@ExceptionHandler({RuntimeException.class})
 	public String error(HttpServletRequest request, Exception ex, Model model) {
 		model.addAttribute("exception", ex);
