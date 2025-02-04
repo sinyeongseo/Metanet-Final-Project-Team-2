@@ -29,23 +29,16 @@ public class AuthRestController {
 
 	// 회원가입
 	@PostMapping("/join")
-	public ResponseEntity<ResponseDto> join(@RequestBody Member member) {	
-		System.out.println("member" + member);
-		try {
-			// 비밀번호 확인 여부 체크
-			if (!member.getPassword().equals(member.getPassword2())) {				
-				return ResponseDto.notSamePassword();
-			} else {
-				if(member.getRole().equals("teacher")) {
-					if(member.getBank().isEmpty()) {
-						return ResponseDto.nullInputValue();
-					}
-				} 
-				String encodedPw = passwordEncoder.encode(member.getPassword());				
-				member.setPassword(encodedPw);
-				member.setRole("user");
-				memberService.insertMember(member);				
-			}
+	public ResponseEntity<ResponseDto> join(@RequestBody Member member) {			
+		try {			
+			if(member.getRole().equals("teacher")) {
+				if(member.getBank().isEmpty()) {
+					return ResponseDto.nullInputValue();
+				}
+			} 
+			String encodedPw = passwordEncoder.encode(member.getPassword());				
+			member.setPassword(encodedPw);			
+			memberService.insertMember(member);							
 		} catch (DuplicateKeyException e) {
 			member.setId(null);
 			return ResponseDto.duplicatedId();
