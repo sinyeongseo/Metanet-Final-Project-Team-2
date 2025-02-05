@@ -12,17 +12,30 @@
 	]]>
 	</select>
 
-	<select id="likeLectures" parameterType="map">
-    <![CDATA[
-        UPDATE lectures l
-        JOIN likes li ON l.lecture_id = li.lecture_id
-        SET 
-            l.likes = l.likes + IF(li.like_status = false, 1, -1),
-            li.like_status = NOT li.like_status
-        WHERE li.lecture_id = #{lectureId}
-          AND li.member_id = #{memberId}
+	<select id="checkLikeLectures" parameterType="map" resultType="Boolean">
+     <![CDATA[
+        SELECT EXISTS ( SELECT * FROM likes WHERE member_id = #{memberId} AND lecture_id = #{lectureId} )
     ]]>
 	</select>
+
+    <update id="updateLikeLectures" parameterType="map" >
+     <![CDATA[
+        UPDATE lectures SET likes = likes + IF( #{exist} , -1 , +1 ) WHERE member_id = #{memberId} AND lecture_id = #{lectureId}
+    ]]>
+	</update>
+
+    <insert id="insertLikeLectures" parameterType="map">
+    <![CDATA[
+        INSERT INTO likes (member_id, lecture_id, like_status)
+        VALUES (#{memberId}, #{lectureId}, true)
+    ]]>
+	</insert>
+
+    <delete id="deleteLikeLectures" parameterType="map">
+     <![CDATA[
+        DELETE FROM likes WHERE member_id = #{memberId} AND lecture_id = #{lectureId}
+    ]]>
+	</delete>
 
 	<insert id="lectureFileUpload" parameterType="com.example.myapp.lecture.model.LectureFile">
 	<![CDATA[
@@ -82,13 +95,13 @@
 	</select>
 
 
-    <update id="deleteLectures" parameterType="map">
+    <delete id="deleteLectures" parameterType="map">
     <![CDATA[
         UPDATE lectures
         SET deleted = true
         WHERE lecture_id = #{lectureId} AND member_id = #{memberId}
     ]]>
-    </update>
+    </delete>
 
 <select id="getLectureDetail" parameterType="Long" resultType="com.example.myapp.lecture.model.Lecture">
     <![CDATA[

@@ -15,7 +15,13 @@ public interface ILectureRepository {
 
     Lecture getLectureDetail(Long lectureId);
 
-    void likeLectures(Long memberId, Long lectureId);
+    boolean checkLikeLectures(Long memberId, Long lectureId);
+
+    void insertLikeLectures(Long memberId, Long lectureId);
+
+    void deleteLikeLectures(Long memberId, Long lectureId);
+
+    void updateLikeLectures(Long memberId, Long lectureId, boolean exist);
 
     int lectureFileUpload(LectureFile lectureFile);
 

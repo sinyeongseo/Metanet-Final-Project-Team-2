@@ -22,11 +22,6 @@ public class LectureService implements ILectureService {
     }
 
     @Override
-    public void likeLectures(Long memberId, Long lectureId) {
-        lectureDao.likeLectures(lectureId, lectureId);
-    }
-
-    @Override
     public int lectureFileUpload(LectureFile lectureFile) {
         return lectureDao.lectureFileUpload(lectureFile);
     }
@@ -60,6 +55,26 @@ public class LectureService implements ILectureService {
     @Override
     public Lecture getLectureDetail(Long lectureId) {
         return lectureDao.getLectureDetail(lectureId);
+    }
+
+    @Override
+    public boolean checkLikeLectures(Long memberId, Long lectureId) {
+        return lectureDao.checkLikeLectures(memberId, lectureId);
+    }
+
+    @Override
+    public void insertLikeLectures(Long memberId, Long lectureId) {
+        lectureDao.insertLikeLectures(memberId, lectureId);
+    }
+
+    @Override
+    public void deleteLikeLectures(Long memberId, Long lectureId) {
+        lectureDao.deleteLikeLectures(memberId, lectureId);
+    }
+
+    @Override
+    public void updateLikeLectures(Long memberId, Long lectureId, boolean exist) {
+        lectureDao.updateLikeLectures(memberId, lectureId, exist);
     }
 
 }

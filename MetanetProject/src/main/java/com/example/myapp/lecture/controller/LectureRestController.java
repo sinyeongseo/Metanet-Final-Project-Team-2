@@ -95,8 +95,14 @@ public class LectureRestController {
 
         Long memberId = lectureService.getMemberIdById(member_id);
 
+        boolean exist = lectureService.checkLikeLectures(memberId, lectureId);
         try {
-            lectureService.likeLectures(memberId, lectureId);
+            lectureService.updateLikeLectures(memberId, lectureId, exist);
+            if (exist) {
+                lectureService.deleteLikeLectures(memberId, lectureId);
+            } else {
+                lectureService.insertLikeLectures(memberId, lectureId);
+            }
         } catch (Exception e) {
             return ResponseDto.databaseError();
         }
