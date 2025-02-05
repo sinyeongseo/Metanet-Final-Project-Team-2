@@ -19,4 +19,5 @@ public interface IMemberRepository {
 	Member selectMember(String userid);
 	
 	Optional<Member> findById(String id);
+	Long getMemberIdById(String memberId);
 }
