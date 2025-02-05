@@ -17,7 +17,6 @@ public interface IMemberService {
 	// 코드 검증
 	ResponseEntity<ResponseDto> verifyEmailCode(String email, String code);
 	
-	ResponseEntity<ResponseDto> verifyPwCode (String email, String code);
 	//회원가입
 	void insertMember(Member member) ;
 	
