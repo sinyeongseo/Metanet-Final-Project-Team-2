@@ -28,20 +28,10 @@ public class AdminController {
 	// 회원 전체 조회
 	@GetMapping("/accounts")
 	ResponseEntity<ResponseDto> getAllMembers() {
-		String memberId = null;
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		
-        try {
-            if (authentication != null) {
-                // 현재 인증된 사용자 정보
-                memberId = authentication.getName();
-            }
-
-            if (memberId == null)
-                return ResponseDto.noAuthentication();
-        } catch (Exception exception) {
-            log.info(exception.getMessage());
-            return ResponseDto.databaseError();
+        String user =  GetAuthenUser.getAuthenUser();
+        // 인증되지 않은 경우는 바로 처리
+        if (user == null) {
+            return ResponseDto.noAuthentication();
         }
         
 		ResponseEntity<ResponseDto> response = adminService.getAllMembers();
