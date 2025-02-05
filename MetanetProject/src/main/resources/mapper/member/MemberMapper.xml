@@ -5,12 +5,12 @@
 <mapper namespace="com.example.myapp.member.dao.IMemberRepository">
 
 	<insert id="insertMember" parameterType="com.example.myapp.member.model.Member">
-	<![CDATA[
-		INSERT INTO 
-			members (id, name, password, phone, email, role, deleted, birth, profile, bank) 
-		VALUES 
-			(#{id}, #{name}, #{password}, #{phone}, #{email}, #{role}, 0, #{birth}, #{profile}, #{bank})
-	]]>
+		<![CDATA[
+			INSERT INTO 
+				members (id, name, password, phone, email, role, deleted, birth, profile, bank) 
+			VALUES 
+				(#{id}, #{name}, #{password}, #{phone}, #{email}, #{role}, 0, #{birth}, #{profile}, #{bank})
+		]]>
 	</insert>
 
 	<select id="findById" resultType="com.example.myapp.member.model.Member">
@@ -18,11 +18,11 @@
 	</select>
 	
 	<select id="getPassword" parameterType="string" resultType="string">
-	<![CDATA[
-		SELECT password
-		FROM members
-		WHERE userid=#{userid}
-	]]>
+		<![CDATA[
+			SELECT password
+			FROM members
+			WHERE userid=#{userid}
+		]]>
 	</select>
 	
 	<select id="findByEmail" resultType="int">
@@ -42,10 +42,33 @@
 	</update>
 
 	<select id="getMemberIdById" parameterType="string" resultType="string">
-	<![CDATA[
-		SELECT member_id
-		FROM members
-		WHERE id=#{memberId}
-	]]>
+		<![CDATA[
+			SELECT member_id
+			FROM members
+			WHERE id=#{memberId}
+		]]>
 	</select>
+	
+	<select id="getAllMembers" resultType="com.example.myapp.member.model.MemberResponse">
+		<![CDATA[
+			SELECT member_id AS memberId, CONCAT(LEFT(phone, 4), '****', RIGHT(phone, 5)) AS phone, email, role, name
+			FROM members
+		]]>
+	</select>
+	
+	<delete id="deleteMember">
+		<![CDATA[
+			DELETE
+			FROM members
+			WHERE member_id = ${memberId}
+		]]>
+	</delete>
+	
+	<delete id="deleteAllMembers">
+		<![CDATA[
+	        DELETE FROM members
+        	WHERE role <> 'admin'
+		]]>
+	</delete>
+	
 </mapper>
