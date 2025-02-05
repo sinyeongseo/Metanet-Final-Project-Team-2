@@ -77,31 +77,30 @@ public class LectureRestController {
     }
 
     // 좋아요 누른 강의 목록 보기 -- 고범준
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    @GetMapping("/like")
-    public ResponseEntity<ResponseDto> likeLectures() {
+    @SuppressWarnings({ "rawtypes" })
+    @PostMapping("/like/{lecture_id}")
+    public ResponseEntity<ResponseDto> likeLectures(@PathVariable("lecture_id") Long lectureId) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        String memberId = "";
+        String member_id = "";
 
         if (authentication != null) {
             // 현재 인증된 사용자 정보
-            memberId = authentication.getName();
-            log.info(memberId);
+            member_id = authentication.getName();
+            log.info(member_id);
         }
-        if (memberId == null)
+        if (member_id == null)
             return ResponseDto.noAuthentication();
 
-        Long member_id = lectureService.getMemberIdById(memberId);
+        Long memberId = lectureService.getMemberIdById(member_id);
 
-        List<Lecture> lecture = new ArrayList<Lecture>();
         try {
-            lecture = lectureService.likeLectures(member_id);
+            lectureService.likeLectures(memberId, lectureId);
         } catch (Exception e) {
             return ResponseDto.databaseError();
         }
-        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, lecture);
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
         return ResponseEntity.ok(responseBody);
     }
 

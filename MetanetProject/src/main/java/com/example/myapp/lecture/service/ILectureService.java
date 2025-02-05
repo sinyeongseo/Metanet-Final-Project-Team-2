@@ -11,7 +11,7 @@ public interface ILectureService {
 
     Lecture getLectureDetail(Long lectureId);
 
-    List<Lecture> likeLectures(Long memberId);
+    void likeLectures(Long memberId, Long lectureId);
 
     int lectureFileUpload(LectureFile lectureFile);
 

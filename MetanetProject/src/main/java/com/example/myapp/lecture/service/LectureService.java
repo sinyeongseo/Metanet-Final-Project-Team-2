@@ -22,8 +22,8 @@ public class LectureService implements ILectureService {
     }
 
     @Override
-    public List<Lecture> likeLectures(Long lectureId) {
-        return lectureDao.likeLectures(lectureId);
+    public void likeLectures(Long memberId, Long lectureId) {
+        lectureDao.likeLectures(lectureId, lectureId);
     }
 
     @Override

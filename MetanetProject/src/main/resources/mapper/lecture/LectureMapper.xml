@@ -12,13 +12,15 @@
 	]]>
 	</select>
 
-	<select id="likeLectures" parameterType="Long" resultType="com.example.myapp.lecture.model.Lecture">
-  	<![CDATA[
-        SELECT l.*
-        FROM lectures l
-        INNER JOIN likes li ON l.lecture_id = li.lecture_id
-        WHERE li.member_id = #{member_id}
-          AND li.like_status = true
+	<select id="likeLectures" parameterType="map">
+    <![CDATA[
+        UPDATE lectures l
+        JOIN likes li ON l.lecture_id = li.lecture_id
+        SET 
+            l.likes = l.likes + IF(li.like_status = false, 1, -1),
+            li.like_status = NOT li.like_status
+        WHERE li.lecture_id = #{lectureId}
+          AND li.member_id = #{memberId}
     ]]>
 	</select>
 
