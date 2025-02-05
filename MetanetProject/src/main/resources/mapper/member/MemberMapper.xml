@@ -25,6 +25,14 @@
 	]]>
 	</select>
 	
+	<select id="findByEmail" resultType="int">
+		SELECT COUNT(*) FROM members WHERE email = #{email}	
+	</select>
+	
+	<update id="setNewPw">
+		UPDATE members SET password = #{password} WHERE email = #{email}  		
+	</update>
+	
 	<select id="getMemberIdById" parameterType="string" resultType="string">
 	<![CDATA[
 		SELECT member_id
@@ -32,5 +40,4 @@
 		WHERE id=#{memberId}
 	]]>
 	</select>
-	
 </mapper>
