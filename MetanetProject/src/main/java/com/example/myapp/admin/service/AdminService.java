@@ -42,7 +42,7 @@ public class AdminService implements IAdminService{
 	public ResponseEntity<ResponseDto> deleteMembers(DeleteMemberRequest memberIds) {
 		try {
 			for (Long memberId : memberIds.getMemberIds()) {
-				memberRepository.deleteMember(memberId);
+				memberRepository.forceDeleteMember(memberId);
 			}
 		} catch(Exception e) {
 			e.printStackTrace();

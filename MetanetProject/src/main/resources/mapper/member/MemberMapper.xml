@@ -56,7 +56,7 @@
 		]]>
 	</select>
 	
-	<delete id="deleteMember">
+	<delete id="forceDeleteMember">
 		<![CDATA[
 			DELETE
 			FROM members
