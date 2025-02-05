@@ -154,6 +154,31 @@ public class MemberService implements IMemberService {
 			return ResponseDto.serverError();
 		}
 	}
+	
+	@Override
+	public ResponseEntity<ResponseDto> verifyPwCode(String email, String code) {
+		
+		try {
+			String codeFoundByEmail = redisUtil.getData(email);
+
+			// 이메일 코드가 없을 경우
+			if (codeFoundByEmail == null) {
+				return ResponseDto.notExistEmail();
+			}
+
+			// 코드가 일치하지 않는 경우
+			if (!codeFoundByEmail.equals(code)) {
+				return ResponseDto.certificateFail();
+			}
+
+			// 코드가 일치하는 경우
+			ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+			return ResponseEntity.ok(responseBody);
+
+		} catch (Exception e) {
+			return ResponseDto.serverError();
+		}
+	}
 
 	@Override
 	public JwtToken loginService(Member member) {
@@ -189,8 +214,9 @@ public class MemberService implements IMemberService {
 
 	@Override
 	public void resetPw(String email, String password) {
-
+						
 		memberDao.setNewPw(email, password);
 	}
+
 
 }
