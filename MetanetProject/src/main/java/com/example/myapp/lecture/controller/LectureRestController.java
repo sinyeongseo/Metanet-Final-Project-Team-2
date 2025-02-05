@@ -61,6 +61,21 @@ public class LectureRestController {
         return ResponseEntity.ok(responseBody);
     }
 
+    // 특정 강의의 조회 -- 고범준
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @GetMapping("/{lecture_id}")
+    public ResponseEntity<ResponseDto> getLectureDetail(@PathVariable("lecture_id") Long lectureId) {
+
+        Lecture lecture = new Lecture();
+        try {
+            lecture = lectureService.getLectureDetail(lectureId);
+        } catch (Exception e) {
+            return ResponseDto.databaseError();
+        }
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, lecture);
+        return ResponseEntity.ok(responseBody);
+    }
+
     // 좋아요 누른 강의 목록 보기 -- 고범준
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @GetMapping("/like")

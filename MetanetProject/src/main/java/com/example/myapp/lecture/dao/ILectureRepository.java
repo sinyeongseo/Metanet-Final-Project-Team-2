@@ -13,6 +13,8 @@ import com.example.myapp.lecture.model.LectureId;
 public interface ILectureRepository {
     List<Lecture> getAllLectures();
 
+    Lecture getLectureDetail(Long lectureId);
+
     List<Lecture> likeLectures(Long member_id);
 
     int lectureFileUpload(LectureFile lectureFile);

@@ -6,7 +6,7 @@
 
 	<select id="getAllLectures" resultType="com.example.myapp.lecture.model.Lecture">
 	<![CDATA[
-		SELECT member_id, title, profile, description, description_pic, category, price, status, link, likes, limit_student, deadline_time, lectures_date, start_date, end_date, deleted
+		SELECT member_id as memberId, title, profile, description, description_pic as descriptionPic, category, price, status, link, likes, limit_student as limitStudent, deadline_time as deadlineTime, lectures_date as lecturesDate, start_date as startDate,  end_date as endDate, deleted
 		FROM lectures
 		WHERE deleted = 0
 	]]>
@@ -88,11 +88,14 @@
     ]]>
     </update>
 
-	<!-- <insert id="getLectures" resultType="com.example.myapp.lecture.model.Lecture">
-	<![CDATA[
-
-	]]>
-	</insert> -->
+<select id="getLectureDetail" parameterType="Long" resultType="com.example.myapp.lecture.model.Lecture">
+    <![CDATA[
+        SELECT 
+            member_id as memberId, title, profile, description, description_pic as descriptionPic, category, price, status, link, likes, limit_student as limitStudent, deadline_time as deadlineTime, lectures_date as lecturesDate, start_date as startDate,  end_date as endDate, deleted
+        FROM lectures
+        WHERE lecture_id = #{lectureId}
+    ]]>
+</select>
 
 
 	

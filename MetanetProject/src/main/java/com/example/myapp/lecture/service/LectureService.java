@@ -57,4 +57,9 @@ public class LectureService implements ILectureService {
         return lectureDao.getMemberIdById(memberId);
     }
 
+    @Override
+    public Lecture getLectureDetail(Long lectureId) {
+        return lectureDao.getLectureDetail(lectureId);
+    }
+
 }

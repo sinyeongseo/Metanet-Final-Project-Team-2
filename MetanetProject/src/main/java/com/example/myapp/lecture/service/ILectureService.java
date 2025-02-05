@@ -9,7 +9,9 @@ import com.example.myapp.lecture.model.LectureId;
 public interface ILectureService {
     List<Lecture> getAllLectures();
 
-    List<Lecture> likeLectures(Long member_id);
+    Lecture getLectureDetail(Long lectureId);
+
+    List<Lecture> likeLectures(Long memberId);
 
     int lectureFileUpload(LectureFile lectureFile);
 

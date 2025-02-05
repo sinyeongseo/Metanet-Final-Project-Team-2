@@ -14,8 +14,10 @@ import lombok.ToString;
 public class Lecture {
     private Long memberId;
     private String title;
+    private String profile;
     private String profileUrl;
     private String description;
+    private String descriptionPic;
     private String descriptionPicUrl;
     private String category;
     private Integer price;
