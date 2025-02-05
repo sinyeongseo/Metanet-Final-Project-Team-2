@@ -33,4 +33,14 @@
 		UPDATE members SET password = #{password} WHERE email = #{email}  		
 	</update>
 	
+	
+	<select id="getRoleById">
+		SELECT role FROM members WHERE id =#{id}	
+	</select>
+	
+	<delete id="deleteMember">
+		DELETE FROM members WHERE id= #{id}
+	</delete>
+	
+	
 </mapper>

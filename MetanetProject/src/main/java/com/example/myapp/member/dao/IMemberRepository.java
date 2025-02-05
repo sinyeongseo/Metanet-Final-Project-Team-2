@@ -25,4 +25,8 @@ public interface IMemberRepository {
 	String getUserIdByEmail(String email);
 	
 	void setNewPw(String email, String password);
+	
+	String getRoleById(String id);
+	
+	void deleteMember(String id);
 }
