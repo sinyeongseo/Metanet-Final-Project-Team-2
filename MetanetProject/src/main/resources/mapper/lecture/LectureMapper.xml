@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.myapp.lecture.dao.ILectureRepository">
+
+	<select id="getAllLectures" resultType="com.example.myapp.lecture.model.Lecture">
+	<![CDATA[
+		SELECT member_id, title, profile, description, description_pic, category, price, status, link, likes, limit_student, deadline_time, lectures_date, start_date, end_date, deleted
+		FROM lectures
+		WHERE deleted = 0
+	]]>
+	</select>
+
+	<select id="likeLectures" parameterType="Long" resultType="com.example.myapp.lecture.model.Lecture">
+  	<![CDATA[
+        SELECT l.*
+        FROM lectures l
+        INNER JOIN likes li ON l.lecture_id = li.lecture_id
+        WHERE li.member_id = #{member_id}
+          AND li.like_status = true
+    ]]>
+	</select>
+
+	<insert id="lectureFileUpload" parameterType="com.example.myapp.lecture.model.LectureFile">
+	<![CDATA[
+        INSERT INTO lecture_files (lecture_id, member_id, file_url)
+        VALUES (#{lectureId}, #{memberId}, #{fileUrl})
+    ]]>
+	</insert>
+
+	<update id="setRefundStatus" parameterType="com.example.myapp.lecture.model.LectureFile">
+	<![CDATA[
+        UPDATE attends
+        SET is_refundable = false
+        WHERE lecture_id = #{lectureId} AND member_id = #{memberId}
+    ]]>
+	</update>
+
+
+	<insert id="registerLectures" parameterType="com.example.myapp.lecture.model.Lecture">
+	<![CDATA[
+		INSERT INTO lectures (
+            member_id, title, profile, description, description_pic, category, 
+            price, link	, limit_student, deadline_time, start_date, end_date
+        ) VALUES (
+            #{memberId}, #{title}, #{profileUrl}, #{description}, #{descriptionPicUrl}, #{category}, 
+            #{price}, #{link}, #{limitStudent}, #{deadlineTime}, #{startDate}, #{endDate}
+        )
+	]]>
+	</insert>
+
+	<update id="updateLectures" parameterType="com.example.myapp.lecture.model.Lecture">
+    <![CDATA[
+        UPDATE lectures
+    <set>
+        <if test="title != null"> title = #{title}, </if>
+        <if test="profileUrl != null"> profile = #{profileUrl}, </if>
+        <if test="description != null"> description = #{description}, </if>
+        <if test="descriptionPicUrl != null"> description_pic = #{descriptionPicUrl}, </if>
+        <if test="category != null"> category = #{category}, </if>
+        <if test="price != null"> price = #{price}, </if>
+        <if test="status != null"> status = #{status}, </if>
+        <if test="link != null"> link = #{link}, </if>
+        <if test="limitStudent != null"> limit_student = #{limitStudent}, </if>
+        <if test="deadlineTime != null"> deadline_time = #{deadlineTime}, </if>
+        <if test="lecturesDate != null"> lectures_date = #{lecturesDate}, </if>
+        <if test="startDate != null"> start_date = #{startDate}, </if>
+        <if test="endDate != null"> end_date = #{endDate}, </if>
+        <if test="deleted != null"> deleted = #{deleted} </if>
+    </set>
+        WHERE lecture_id = #{lectureId}
+    ]]>
+	</update>
+
+	<select id="getMemberIdById" parameterType="String" resultType="Long">
+  	<![CDATA[
+        SELECT member_id FROM members WHERE id = #{memberId}
+    ]]>
+	</select>
+
+
+    <update id="deleteLectures" parameterType="map">
+    <![CDATA[
+        UPDATE lectures
+        SET deleted = true
+        WHERE lecture_id = #{lectureId} AND member_id = #{memberId}
+    ]]>
+    </update>
+
+	<!-- <insert id="getLectures" resultType="com.example.myapp.lecture.model.Lecture">
+	<![CDATA[
+
+	]]>
+	</insert> -->
+
+
+	
+</mapper>
