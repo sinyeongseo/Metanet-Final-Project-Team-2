@@ -11,12 +11,10 @@ import com.example.myapp.member.model.Member;
 @Repository
 @Mapper
 public interface IMemberRepository {
-	
-	// 인증코드 발송한 이메일 주소 조회???
-	//void
-	
+
 	void insertMember(Member member) ;
 	Member selectMember(String userid);
 	
 	Optional<Member> findById(String id);
+	String getMemberIdById(String memberId);
 }
