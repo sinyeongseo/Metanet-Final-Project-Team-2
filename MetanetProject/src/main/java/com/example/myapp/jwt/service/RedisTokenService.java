@@ -36,8 +36,15 @@ public class RedisTokenService {
         return (RefreshToken) redisTemplate.opsForValue().get(tokenKey);
     }
 
-    // 리프레시 토큰 TTL 갱신
-    public void updateRefreshTokenTTL(String tokenKey) {
-        redisTemplate.expire(tokenKey, refreshTokenTtl / 1000, TimeUnit.SECONDS);
+    // 리프레시 토큰 존재 여부 확인
+    public boolean existsRefreshToken(String tokenKey) {
+        // Redis에서 해당 키에 대한 값이 있는지 확인
+        return redisTemplate.hasKey(tokenKey); // true: 키가 존재, false: 키가 없음
     }
+    
+    // 레디스에 있는 값 삭제
+    public void deleteRefreshToken(String userid) {  
+    	redisTemplate.delete(userid);
+    }
+    
 }

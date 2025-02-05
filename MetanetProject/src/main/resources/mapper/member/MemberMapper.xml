@@ -32,7 +32,15 @@
 	<update id="setNewPw">
 		UPDATE members SET password = #{password} WHERE email = #{email}  		
 	</update>
+
+	<select id="getRoleById">
+		SELECT role FROM members WHERE id =#{id}	
+	</select>
 	
+	<update id="deleteMember">
+		UPDATE members SET deleted = 1 WHERE id =#{id}	
+	</update>
+
 	<select id="getMemberIdById" parameterType="string" resultType="string">
 	<![CDATA[
 		SELECT member_id

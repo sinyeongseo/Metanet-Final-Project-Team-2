@@ -3,12 +3,15 @@ package com.example.myapp.member.service;
 import java.util.Optional;
 import java.util.Random;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -21,6 +24,7 @@ import com.example.myapp.common.response.ResponseMessage;
 import com.example.myapp.jwt.JwtTokenProvider;
 import com.example.myapp.jwt.model.JwtToken;
 import com.example.myapp.jwt.model.RefreshToken;
+import com.example.myapp.jwt.service.CustomUserDetailsService;
 import com.example.myapp.jwt.service.RedisTokenService;
 import com.example.myapp.member.dao.IMemberRepository;
 import com.example.myapp.member.model.Member;
@@ -48,6 +52,9 @@ public class MemberService implements IMemberService {
 
 	@Autowired
 	IMemberRepository memberDao;
+
+	@Autowired
+	JwtTokenProvider jwtProvider;
 
 	@Override
 	public void insertMember(Member member) {
@@ -193,4 +200,74 @@ public class MemberService implements IMemberService {
 		memberDao.setNewPw(email, password);
 	}
 
+	@Override
+	public String checkRefreshToken(String refreshToken) {
+
+		// refresh token 복호화
+		String docoderesult = jwtProvider.decodeRefreshToken(refreshToken);
+		String result = "";
+
+		if (docoderesult.equals("expire")) {
+			result = "expire";
+		} else if (docoderesult.equals("invalid signature")) {
+			result = "invalid signature";
+		} else if (docoderesult.equals("invalid token")) {
+			result = "invalid token";
+		} else if (docoderesult.equals("error")) {
+			result = "error";
+		} else {
+			// 레디스와 비교
+			boolean tokenexists = redisTokenService.existsRefreshToken(docoderesult);
+			if (tokenexists == true) {
+
+				JwtToken newTokens = jwtProvider.generateTokenWithUserId(docoderesult);
+
+				JSONObject jsonResponse = new JSONObject();
+				jsonResponse.put("accessToken", newTokens.getAccessToken());
+				jsonResponse.put("refreshToken", newTokens.getRefreshToken());
+				result = jsonResponse.toString();
+
+			} else if (tokenexists == false) {
+				result = "not redis";
+			}
+		}
+
+		return result;
+	}
+
+	@Override
+	public boolean revokeRefreshToken(String refreshToken) {
+		try {
+			
+			String docoderesult = jwtProvider.decodeRefreshToken(refreshToken);			
+			redisTokenService.existsRefreshToken(docoderesult);
+
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	@Override
+	public boolean deleteMemberByToken(String refreshToken) {
+		try {
+			//refresh token 디코드
+			String docoderesult = jwtProvider.decodeRefreshToken(refreshToken);
+			memberDao.deleteMember(docoderesult);
+			redisTokenService.deleteRefreshToken(docoderesult);
+			
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	@Override
+	public boolean checkRefreshTokenValidity(String refreshToken) {
+		//refresh token 디코드
+		String docoderesult = jwtProvider.decodeRefreshToken(refreshToken);
+		//회원 ID에 따른 토큰 존재하는지 확인 후 결과 값 반환
+		return redisTokenService.existsRefreshToken(docoderesult);
+
+	}
 }

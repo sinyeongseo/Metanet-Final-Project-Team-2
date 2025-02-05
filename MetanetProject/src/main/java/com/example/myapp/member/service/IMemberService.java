@@ -29,4 +29,13 @@ public interface IMemberService {
 	boolean findByEmail(String email);
 
 	void resetPw(String email, String password);
+	
+	String checkRefreshToken(String refreshToken);
+	
+	boolean revokeRefreshToken(String refreshToken);
+	
+	
+	boolean checkRefreshTokenValidity(String refreshToken);
+
+	boolean deleteMemberByToken(String refreshToken);
 }
