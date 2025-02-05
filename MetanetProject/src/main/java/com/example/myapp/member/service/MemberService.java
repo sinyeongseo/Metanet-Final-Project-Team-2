@@ -31,7 +31,6 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -40,17 +39,16 @@ public class MemberService implements IMemberService {
 	private final JavaMailSender javaMailSender;
 	private final RedisUtil redisUtil;
 	private static final String senderEmail = "neighclova@gmail.com";
-	
+
 	private final AuthenticationManagerBuilder authenticationManagerBuilder;
 	private final JwtTokenProvider jwtTokenProvider;
-	
-	@Autowired
-    private final RedisTokenService redisTokenService;
 
-	
+	@Autowired
+	private final RedisTokenService redisTokenService;
+
 	@Autowired
 	IMemberRepository memberDao;
-	
+
 	@Override
 	public void insertMember(Member member) {
 		memberDao.insertMember(member);
@@ -61,56 +59,59 @@ public class MemberService implements IMemberService {
 	public Optional<Member> findById(String id) {
 		return memberDao.findById(id);
 	}
-	
-    private String createCode() {
-        int leftLimit = 48; // number '0'
-        int rightLimit = 122; // alphabet 'z'
-        int targetStringLength = 6;
-        Random random = new Random();
 
-        return random.ints(leftLimit, rightLimit + 1)
-                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 | i >= 97))
-                .limit(targetStringLength)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                .toString();
-    }
+	private String createCode() {
+		int leftLimit = 48; // number '0'
+		int rightLimit = 122; // alphabet 'z'
+		int targetStringLength = 6;
+		Random random = new Random();
 
-    // 이메일 내용 초기화
-    private String setContext(String code) {
-        Context context = new Context();
-        TemplateEngine templateEngine = new TemplateEngine();
-        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+		return random.ints(leftLimit, rightLimit + 1).filter(i -> (i <= 57 || i >= 65) && (i <= 90 | i >= 97))
+				.limit(targetStringLength)
+				.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
+	}
 
-        context.setVariable("code", code);
+	// 이메일 내용 초기화
+	private String setContext(String code) {
+		Context context = new Context();
+		TemplateEngine templateEngine = new TemplateEngine();
+		ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
 
-        templateResolver.setPrefix("templates/member/");
-        templateResolver.setSuffix(".html");
-        templateResolver.setTemplateMode(TemplateMode.HTML);
-        templateResolver.setCacheable(false);
+		context.setVariable("code", code);
 
-        templateEngine.setTemplateResolver(templateResolver);
+		templateResolver.setPrefix("templates/member/");
+		templateResolver.setSuffix(".html");
+		templateResolver.setTemplateMode(TemplateMode.HTML);
+		templateResolver.setCacheable(false);
 
-        return templateEngine.process("mail", context);
-    }
+		templateEngine.setTemplateResolver(templateResolver);
 
-    // 이메일 폼 생성
-    private MimeMessage createEmailForm(String email) throws MessagingException {
-        String authCode = createCode();
+		return templateEngine.process("mail", context);
+	}
 
-        MimeMessage message = javaMailSender.createMimeMessage();
-        message.addRecipients(MimeMessage.RecipientType.TO, email);
-        message.setSubject("[Metanet] 회원가입 이메일 인증번호입니다.");
-        message.setFrom(senderEmail);
-        message.setText(setContext(authCode), "utf-8", "html");
+	// 이메일 폼 생성
+	private MimeMessage createEmailForm(String type, String email) throws MessagingException {
+		String authCode = createCode();
 
-        // Redis 에 해당 인증코드 인증 시간 설정
-        redisUtil.setDataExpire(email, authCode, 60 * 30L);
+		MimeMessage message = javaMailSender.createMimeMessage();
+		message.addRecipients(MimeMessage.RecipientType.TO, email);
+		if (type.equals("join")) {
+			message.setSubject("[Metanet] 회원가입 이메일 인증번호입니다.");
+		} else if (type.equals("password")) {
+			message.setSubject("[Metanet] 비밀번호 재발급 인증번호입니다.");
+		}
 
-        return message;
-    }
+		message.setFrom(senderEmail);
+		message.setText(setContext(authCode), "utf-8", "html");
+
+		// Redis 에 해당 인증코드 인증 시간 설정
+		redisUtil.setDataExpire(email, authCode, 60 * 30L);
+
+		return message;
+	}
 
 	@Override
-	public ResponseEntity<ResponseDto> sendEmail(String email) {
+	public ResponseEntity<ResponseDto> sendEmail(String type, String email) {
 		try {
 			if (redisUtil.existData(email)) {
 				redisUtil.deleteData(email);
@@ -120,7 +121,7 @@ public class MemberService implements IMemberService {
 		}
 
 		try {
-			MimeMessage emailForm = createEmailForm(email);
+			MimeMessage emailForm = createEmailForm(type, email);
 			javaMailSender.send(emailForm);
 		} catch (MessagingException e) {
 			return ResponseDto.mailSendFail();
@@ -129,7 +130,6 @@ public class MemberService implements IMemberService {
 		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
 		return ResponseEntity.ok(responseBody);
 	}
-
 
 	@Override
 	public ResponseEntity<ResponseDto> verifyEmailCode(String email, String code) {
@@ -154,34 +154,43 @@ public class MemberService implements IMemberService {
 			return ResponseDto.serverError();
 		}
 	}
-	
+
 	@Override
 	public JwtToken loginService(Member member) {
 		// 1. ID + password 를 기반으로 Authentication 객체 생성
-		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member.getId(), member.getPassword());
+		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+				member.getId(), member.getPassword());
 
 		// 2. 실제 검증. authenticate() 메서드를 통해 요청된 Member 에 대한 검증 진행
 		Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-		
-        // 3. 인증 정보를 기반으로 JWT 토큰 생성
-        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);        
-        
-        
-        //4. 리프레시 토큰 redis에 저장
-        String refreshToken = jwtToken.getRefreshToken(); // 리프레시 토큰        
-        String userId = member.getId(); // 사용자 ID
-        RefreshToken refreshTokenObj = new RefreshToken(refreshToken, userId);
-        
-        // 5. Redis에 리프레시 토큰 저장       
-        redisTokenService.saveRefreshToken(userId, refreshTokenObj);        
-        		
-        return jwtToken;
+
+		// 3. 인증 정보를 기반으로 JWT 토큰 생성
+		JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
+
+		// 4. 리프레시 토큰 redis에 저장
+		String refreshToken = jwtToken.getRefreshToken(); // 리프레시 토큰
+		String userId = member.getId(); // 사용자 ID
+		RefreshToken refreshTokenObj = new RefreshToken(refreshToken, userId);
+
+		// 5. Redis에 리프레시 토큰 저장
+		redisTokenService.saveRefreshToken(userId, refreshTokenObj);
+
+		return jwtToken;
 	}
 
+	@Override
+	public boolean findByEmail(String email) {
+		// 메일이 없는 경우 오류
+		if (memberDao.findByEmail(email) != 1) {
+			return false;
+		}
+		return true;
+	}
 
+	@Override
+	public void resetPw(String email, String password) {
 
-	
-
-
+		memberDao.setNewPw(email, password);
+	}
 
 }
