@@ -103,15 +103,25 @@
     ]]>
     </delete>
 
-<select id="getLectureDetail" parameterType="Long" resultType="com.example.myapp.lecture.model.Lecture">
-    <![CDATA[
-        SELECT 
-            member_id as memberId, title, profile, description, description_pic as descriptionPic, category, price, status, link, likes, limit_student as limitStudent, deadline_time as deadlineTime, lectures_date as lecturesDate, start_date as startDate,  end_date as endDate, deleted
-        FROM lectures
-        WHERE lecture_id = #{lectureId}
-    ]]>
-</select>
+    <select id="getLectureDetail" parameterType="Long" resultType="com.example.myapp.lecture.model.Lecture">
+        <![CDATA[
+            SELECT 
+                member_id as memberId, title, profile, description, description_pic as descriptionPic, category, price, status, link, likes, limit_student as limitStudent, deadline_time as deadlineTime, lectures_date as lecturesDate, start_date as startDate,  end_date as endDate, deleted
+            FROM lectures
+            WHERE lecture_id = #{lectureId}
+        ]]>
+    </select>
 
-
+	<delete id="forceDeleteLecture">
+	<![CDATA[
+		DELETE FROM lectures WHERE lecture_id = #{lectureId}
+	]]>
+	</delete>
+	
+	<delete id="deleteAllLectures">
+	<![CDATA[
+		DELETE FROM lectures
+	]]>
+	</delete>
 	
 </mapper>
