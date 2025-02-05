@@ -13,13 +13,13 @@ import com.example.myapp.qna.model.Question;
 import com.example.myapp.qna.service.IQnaService;
 
 @RestController
-@RequestMapping("/qna")
+@RequestMapping("/lectures")
 public class QnaController {
 
 	@Autowired
 	private IQnaService qnaService;
 	
-	@PostMapping("/question")
+	@PostMapping("/{lectureId}/questions")
 	public ResponseEntity<String> registerQuestion(@RequestBody Question question) {
 		try {
 			qnaService.registerQuestion(question);
@@ -33,7 +33,7 @@ public class QnaController {
 				.body("질문 등록 및 알림 성공");
 	}
 	
-	@PostMapping("/answer")
+	@PostMapping("/{lectureId}/questions/{questionId}/answers")
 	public ResponseEntity<String> registerAnswer(@RequestBody Answer answer) {
 		try {
 			qnaService.registerAnswer(answer);

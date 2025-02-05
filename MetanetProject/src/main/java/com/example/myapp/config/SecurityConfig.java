@@ -27,6 +27,7 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 	    // Rest API이기 때문에 csrf 보안 사용 X
 	    http.csrf((csrfConfig) -> csrfConfig.disable());
+	    http.cors(cors -> cors.disable()); //웹소켓땜에 개발할 때 잠깐 꺼둠
 	    // JWT를 사용하기 때문에 세션 사용 비활성
 	    http.sessionManagement((session) -> session
 	            .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -35,6 +36,10 @@ public class SecurityConfig {
 	    http.authorizeHttpRequests(auth -> auth
 	            .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
 	            .requestMatchers("/auth/**").permitAll()
+	            .requestMatchers("/lectures/**").hasAnyRole("User", "Teacher")
+	            .requestMatchers("/ws/**").permitAll()
+	            .requestMatchers("/user/**").permitAll()
+	            .requestMatchers("/topic/**", "/queue/**").permitAll()
 	            //.requestMatchers("/board/test").hasAnyRole("User", "Teacher")
 	            .anyRequest().authenticated()  // 모든 요청은 인증이 필요
 	    );
