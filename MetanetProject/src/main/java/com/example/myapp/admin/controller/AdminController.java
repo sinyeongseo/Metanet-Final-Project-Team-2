@@ -14,6 +14,7 @@ import com.example.myapp.admin.service.IAdminService;
 import com.example.myapp.common.response.ResponseDto;
 import com.example.myapp.lecture.model.DeleteLectureRequest;
 import com.example.myapp.member.model.DeleteMemberRequest;
+import com.example.myapp.util.GetAuthenUser;
 
 import lombok.extern.slf4j.Slf4j;
 
