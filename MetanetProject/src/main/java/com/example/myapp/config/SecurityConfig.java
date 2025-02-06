@@ -35,6 +35,9 @@ public class SecurityConfig {
 				.requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
 				.requestMatchers("/auth/**").permitAll()
 				.requestMatchers("/email/**").permitAll()
+				.requestMatchers("/lecture/all", "lecture/{lecture_id}", "lecture/like/**",
+						"lecture/{review_id}/reviews")
+				.permitAll()
 	            .requestMatchers("/admin/**").hasAnyRole("Admin")
 				.requestMatchers("/lecture/all", "lecture/{lecture_id}", "lecture/like/**").permitAll()
 				// .requestMatchers("/board/test").hasAnyRole("User", "Teacher")

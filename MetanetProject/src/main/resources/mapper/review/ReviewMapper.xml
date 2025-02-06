@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "../mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.myapp.review.dao.IReviewRepository">
+
+	<insert id="registerReview" parameterType="com.example.myapp.review.model.Review" >
+	<![CDATA[
+        SELECT review_id, lecture_id, member_id, content, review_date, answer_id, deleted
+        FROM reviews
+        WHERE lecture_id = #{lectureId}
+        ORDER BY answer_id IS NULL DESC, answer_id ASC, review_date ASC
+    ]]>
+	</insert>
+
+    <select id="getReviews" parameterType="Long" resultType="com.example.myapp.review.model.Review">
+    <![CDATA[
+		SELECT review_id as reviewId, lecture_id as lectureId, member_id as memberId, content, review_date reviewDate, answer_id as answerId
+        FROM reviews
+        WHERE lecture_id = #{lectureId} AND deleted = 0
+	]]>
+    </select>
+
+    <update id="updateReview" parameterType="com.example.myapp.review.model.Review">
+    <![CDATA[
+        UPDATE reviews
+        SET content = #{content}
+        WHERE review_id = #{reviewId} AND member_id = #{memberId}
+    ]]>
+    </update>
+
+    <delete id="deleteReview" parameterType="com.example.myapp.review.model.Review">
+    <![CDATA[
+        UPDATE reviews
+        SET deleted = 1
+        WHERE review_id = #{reviewId} 
+          AND lecture_id = #{lectureId} 
+          AND member_id = #{memberId}
+    ]]>
+    </delete>
+
+</mapper>
