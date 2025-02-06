@@ -156,4 +156,14 @@ public class LectureService implements ILectureService {
         return lectureDao.checkBeforeBuyLecture(params);
     }
 
+    @Override
+    public Boolean checkCanRefund(Map<String, Long> params) {
+        return lectureDao.checkCanRefund(params);
+    }
+
+    @Override
+    public void payRefund(Map<String, Long> params) {
+        lectureDao.payRefund(params);
+    }
+
 }

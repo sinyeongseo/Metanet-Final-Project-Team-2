@@ -177,6 +177,28 @@
         WHERE lecture_id = #{lectureId} 
 </update>
 
+    <select id="checkCanRefund" parameterType="map" resultType="Boolean">
+    <![CDATA[
+        SELECT COUNT(*) 
+        FROM attends 
+        WHERE member_id = #{memberId} 
+        AND lecture_id = #{lectureId} 
+        AND is_refundable = 1
+    ]]>
+    </select>
+
+
+    <update id="payRefund" parameterType="map">
+    <![CDATA[
+        UPDATE pays 
+        SET refund_date = NOW(), 
+            status = 1
+        WHERE member_id = #{memberId} 
+        AND lecture_id = #{lectureId}
+    ]]>
+    </update>
+
+
 
 	<select id="getMemberIdById" parameterType="String" resultType="Long">
   	<![CDATA[

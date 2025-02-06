@@ -59,6 +59,10 @@ public interface ILectureRepository {
 
     void buyLecture(Map<String, Long> params);
 
+    Boolean checkCanRefund(Map<String, Long> params);
+
+    void payRefund(Map<String, Long> params);
+
     Boolean checkBeforeBuyLecture(Map<String, Long> params);
 
     void insertPayLog(Map<String, Long> params);

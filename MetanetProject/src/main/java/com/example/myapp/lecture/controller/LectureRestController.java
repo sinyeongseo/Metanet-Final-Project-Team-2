@@ -487,4 +487,37 @@ public class LectureRestController {
         return ResponseEntity.ok(responseBody);
     }
 
+    // 환불하기기 -- 고범준
+    @SuppressWarnings({ "rawtypes" })
+    @PostMapping("/refund/{lecture_id}")
+    public ResponseEntity<ResponseDto> lectureRefund(@PathVariable("lecture_id") Long lectureId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String memberId = "";
+
+        if (authentication != null) {
+            // 현재 인증된 사용자 정보
+            memberId = authentication.getName();
+            log.info(memberId);
+        }
+        if (memberId == null)
+            return ResponseDto.noAuthentication();
+
+        Long member_id = lectureService.getMemberIdById(memberId);
+
+        Map<String, Long> params = new HashMap<String, Long>();
+        params.put("memberId", member_id);
+        params.put("lectureId", lectureId);
+        try {
+            if (!lectureService.checkCanRefund(params)) {
+                return ResponseDto.cantRefund();
+            }
+            lectureService.payRefund(params);
+        } catch (Exception e) {
+            return ResponseDto.databaseError();
+        }
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+        return ResponseEntity.ok(responseBody);
+    }
+
 }

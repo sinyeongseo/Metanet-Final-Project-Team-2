@@ -46,5 +46,9 @@ public interface ILectureService {
 
     void buyLecture(Map<String, Long> params);
 
+    Boolean checkCanRefund(Map<String, Long> params);
+
+    void payRefund(Map<String, Long> params);
+
     Boolean checkBeforeBuyLecture(Map<String, Long> params);
 }
