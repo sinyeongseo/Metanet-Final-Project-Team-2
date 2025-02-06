@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.myapp.qna.model.Answer;
 import com.example.myapp.qna.model.AnswerDetail;
+import com.example.myapp.qna.model.AnswerUpdateRequest;
 import com.example.myapp.qna.model.Question;
 import com.example.myapp.qna.model.QuestionDetail;
 import com.example.myapp.qna.model.QuestionSummary;
@@ -28,4 +29,7 @@ public interface IQnaRepository {
 	void updateQuestion(@Param("questionId") Long questionId, @Param("title") String title, @Param("content") String content);
 	void deleteQuestionImages(Long questionId);
 	void deleteQuestion(Long questionId);
+	void updateAnswer(@Param("answerId") Long answerId, @Param("answerUpdateRequest") AnswerUpdateRequest answerUpdateRequest);
+	Long getMemberIdByAnswerId(Long answerId);
+	void deleteAnswer(Long answerId);
 }

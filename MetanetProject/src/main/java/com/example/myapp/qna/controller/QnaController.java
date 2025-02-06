@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.myapp.common.response.ResponseDto;
 import com.example.myapp.qna.model.Answer;
+import com.example.myapp.qna.model.AnswerUpdateRequest;
 import com.example.myapp.qna.model.Question;
 import com.example.myapp.qna.model.QuestionUpdateRequest;
 import com.example.myapp.qna.service.IQnaService;
@@ -101,5 +102,27 @@ public class QnaController {
 		return response;
 	}
 	
+	//답변 수정
+	@PutMapping("/{lectureId}/questions/{questionId}/answers/{answerId}")
+	public ResponseEntity<ResponseDto> updateAnswer(@PathVariable("answerId") Long answerId, @RequestBody AnswerUpdateRequest answerUpdateRequest) {
+		String user =  GetAuthenUser.getAuthenUser();
+        if (user == null) {
+            return ResponseDto.noAuthentication();
+        }
+
+		ResponseEntity<ResponseDto> response = qnaService.updateAnswer(answerId, user, answerUpdateRequest);
+		return response;
+	}
 	
+	//답변 삭제
+	@DeleteMapping("/{lectureId}/questions/{questionId}/answers/{answerId}")
+	public ResponseEntity<ResponseDto> deleteAnswer(@PathVariable("answerId") Long answerId) {
+		String user =  GetAuthenUser.getAuthenUser();
+        if (user == null) {
+            return ResponseDto.noAuthentication();
+        }
+        
+        ResponseEntity<ResponseDto> response = qnaService.deleteAnswer(answerId, user);
+        return response;
+	}
 }

@@ -61,7 +61,7 @@
 	</resultMap>
 	
 	<select id="getAnswerDetails" parameterType="long" resultType="com.example.myapp.qna.model.AnswerDetail">
-		SELECT a.content AS content, reply_date AS date,
+		SELECT a.answer_id AS answerId, a.content AS content, reply_date AS date,
 			m.profile AS profile, m.id AS writerId
 		FROM answers a JOIN members m ON a.member_id = m.member_id
 		WHERE a.question_id = #{questionId}
@@ -88,5 +88,23 @@
 		UPDATE questions
 		SET deleted = 1
 		WHERE question_id = #{questionId}
+	</update>
+	
+	<select id="getMemberIdByAnswerId" parameterType="long" resultType="long">
+		SELECT member_id AS memberId
+		FROM answers
+		WHERE answer_id = #{answerId}
+	</select>
+	
+	<update id="updateAnswer">
+		UPDATE answers
+		SET content = #{answerUpdateRequest.content}
+		WHERE answer_id = #{answerId}
+	</update>
+	
+	<update id="deleteAnswer" parameterType="long">
+		UPDATE answers
+		SET deleted = 1
+		WHERE answer_id = #{answerId}
 	</update>
 </mapper>

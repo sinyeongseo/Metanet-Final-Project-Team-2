@@ -18,6 +18,7 @@ import com.example.myapp.member.dao.IMemberRepository;
 import com.example.myapp.qna.dao.IQnaRepository;
 import com.example.myapp.qna.model.Answer;
 import com.example.myapp.qna.model.AnswerDetail;
+import com.example.myapp.qna.model.AnswerUpdateRequest;
 import com.example.myapp.qna.model.Question;
 import com.example.myapp.qna.model.QuestionDetail;
 import com.example.myapp.qna.model.QuestionSummary;
@@ -174,6 +175,43 @@ public class QnaService implements IQnaService {
 			}
 			
 			qnaRepository.deleteQuestion(questionId);
+		} catch (Exception exception){
+			exception.printStackTrace();
+			return ResponseDto.databaseError();
+		}
+		return ResponseDto.success();
+	}
+
+	//답변 수정 - 소진
+	@Override
+	public ResponseEntity<ResponseDto> updateAnswer(Long answerId, String memberId,
+			AnswerUpdateRequest answerUpdateRequest) {
+		try {
+			Long memberUID = qnaRepository.getMemberIdByAnswerId(answerId);
+			Long writerUID = memberRepository.getMemberIdById(memberId);
+			if (memberUID != writerUID) {
+				return ResponseDto.noPermission();
+			}
+			
+			qnaRepository.updateAnswer(answerId, answerUpdateRequest);
+		} catch (Exception exception){
+			exception.printStackTrace();
+			return ResponseDto.databaseError();
+		}
+		return ResponseDto.success();
+	}
+
+	//답변 삭제 - 소진
+	@Override
+	public ResponseEntity<ResponseDto> deleteAnswer(Long answerId, String memberId) {
+		try {
+			Long memberUID = qnaRepository.getMemberIdByAnswerId(answerId);
+			Long writerUID = memberRepository.getMemberIdById(memberId);
+			if (memberUID != writerUID) {
+				return ResponseDto.noPermission();
+			}
+			
+			qnaRepository.deleteAnswer(answerId);
 		} catch (Exception exception){
 			exception.printStackTrace();
 			return ResponseDto.databaseError();
