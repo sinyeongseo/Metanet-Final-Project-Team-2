@@ -31,4 +31,5 @@ public interface ResponseCode {
 
     //// lecture buy 기능
     String ALREADY_BUYED = "NB";
+    String DENY_REFUND = "DR";
 }
