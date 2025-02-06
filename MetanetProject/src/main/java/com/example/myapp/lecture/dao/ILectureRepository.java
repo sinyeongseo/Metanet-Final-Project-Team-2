@@ -5,9 +5,12 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
+
 import com.example.myapp.lecture.model.Lecture;
 import com.example.myapp.lecture.model.LectureFile;
 import com.example.myapp.lecture.model.LectureId;
+import com.example.myapp.lecture.model.LectureReminderDto;
+import com.example.myapp.lecture.model.LectureScheduled;
 
 @Repository
 @Mapper
@@ -54,4 +57,8 @@ public interface ILectureRepository {
 
     Boolean checkBeforeBuyLecture(Map<String, Long> params);
 
+    
+    List<LectureScheduled> findTodayLectures();
+    
+    List<LectureReminderDto> getLecturesStartingIn30Minutes();
 }
