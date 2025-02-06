@@ -11,7 +11,7 @@ public interface ResponseMessage {
     String DUPLICATE_ID = "duplicate id";
     String VALIDATION_FAILED = "validation failed";
     String NOT_SAME_PW = "not same password and password1";
-    String NULL_INTPUT_VALUE ="null input value";
+    String NULL_INTPUT_VALUE = "null input value";
 
     // HTTP Status 401
     String SIGN_IN_FAILED = "Login information mismatch.";
@@ -28,4 +28,7 @@ public interface ResponseMessage {
     String REDIS_ERROR = "An error occurred while processing Redis.";
     String DATABASE_ERROR = "database error";
     String SERVER_ERROR = "server error";
+
+    // lecture buy 기능
+    String ALREADY_BUYED = "already buyed lecture, no need to buy";
 }
