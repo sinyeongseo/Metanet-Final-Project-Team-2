@@ -71,4 +71,10 @@
 		]]>
 	</delete>
 	
+	<select id="getIdByMemberId" resultType="string">
+		SELECT id
+		FROM members
+		WHERE member_id = #{memberId}
+	</select>
+	
 </mapper>
