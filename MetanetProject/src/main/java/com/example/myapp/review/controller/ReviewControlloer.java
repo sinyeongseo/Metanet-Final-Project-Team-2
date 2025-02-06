@@ -38,8 +38,6 @@ public class ReviewControlloer {
     ILectureService lectureService;
 
     // review 추가 -- 고범준
-    // answer_id 에 review_id 추가 시, 댓글로 인식
-    // 가져올 때, 리뷰글 -> 댓글 있으면 댓글 나오도록 하였음 그냥 리스트로 보여주면 됨
     @SuppressWarnings({ "rawtypes" })
     @PostMapping("/{lecture_id}/reviews")
     public ResponseEntity<ResponseDto> registerReview(@RequestBody Review review,
@@ -54,6 +52,36 @@ public class ReviewControlloer {
 
         review.setMemberId(member_id);
         review.setLectureId(lectureId);
+        try {
+            reviewService.registerReview(review);
+        } catch (Exception e) {
+            return ResponseDto.databaseError();
+        }
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+        return ResponseEntity.ok(responseBody);
+
+    }
+
+    // review 답글 추가 -- 고범준
+    @SuppressWarnings({ "rawtypes" })
+    @PostMapping("/{lecture_id}/reviews/{answer_id}")
+    public ResponseEntity<ResponseDto> registerReReview(@RequestBody Review review,
+            @PathVariable("lecture_id") Long lectureId,
+            @PathVariable("answer_id") Long answerId) {
+
+        String user = GetAuthenUser.getAuthenUser();
+        // 인증되지 않은 경우는 바로 처리
+        if (user == null) {
+            return ResponseDto.noAuthentication();
+        }
+        Long member_id = lectureService.getMemberIdById(user);
+
+        review.setMemberId(member_id);
+        review.setLectureId(lectureId);
+        if (answerId == null || answerId.toString().isEmpty()) {
+            return ResponseDto.invalidGrant();
+        }
+        review.setAnswerId(answerId);
         try {
             reviewService.registerReview(review);
         } catch (Exception e) {
