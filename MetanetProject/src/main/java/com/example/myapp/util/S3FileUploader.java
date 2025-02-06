@@ -46,7 +46,7 @@ public class S3FileUploader {
 				File fileObj = convertMultiPartFileToFile(file);
 				String fileName = table + "_" + purpose + "_" + id;
 
-				if (purpose.equals("classFile")) {
+				if (purpose.equals("classFile") || purpose.equals("questionImage")) {
 					fileName += "_" + UUID.randomUUID();
 				}
 

@@ -28,7 +28,7 @@ public interface IMemberRepository{
 	
 	void deleteMember(String id);
 
-	String getMemberIdById(String memberId);
+	Long getMemberIdById(String memberId);
 	
 	List<MemberResponse> getAllMembers();
 	void forceDeleteMember(Long memberId);

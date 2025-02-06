@@ -2,6 +2,7 @@ package com.example.myapp.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -39,6 +40,9 @@ public class SecurityConfig {
 				.requestMatchers("/lecture/all", "lecture/{lecture_id}", "lecture/like/**",
 						"lecture/{review_id}/reviews")
 				.permitAll()
+				.requestMatchers(HttpMethod.GET, "/lectures/*/questions").permitAll()
+	            .requestMatchers(HttpMethod.GET, "/lectures/*/questions/*").permitAll()
+				.requestMatchers("/lectures/**").hasAnyRole("Student", "Teacher", "Admin")
 	            .requestMatchers("/admin/**").hasAnyRole("Admin")
 				.requestMatchers("/lecture/all", "lecture/{lecture_id}", "lecture/like/**").permitAll()
 				.requestMatchers("/ws/**").permitAll()
