@@ -178,6 +178,11 @@
 		    <artifactId>ognl</artifactId>
 		    <version>3.2.21</version>
 		</dependency>
+		<!--web socket-->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

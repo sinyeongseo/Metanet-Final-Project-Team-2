@@ -30,7 +30,7 @@ public class CartService implements ICartService{
 	public ResponseEntity<ResponseDto> getCarts(String memberId) {
 		List<Cart> carts = null;
 		try {
-			String memberUID = memberRepository.getMemberIdById(memberId);
+			Long memberUID = memberRepository.getMemberIdById(memberId);
 			carts = cartRepository.getCarts(memberUID);
 		} catch (Exception e){
 			e.printStackTrace();
@@ -44,7 +44,7 @@ public class CartService implements ICartService{
 	@Override
 	public ResponseEntity<ResponseDto> addCart(String memberId, String lectureId) {
 		try {
-			String memberUID = memberRepository.getMemberIdById(memberId);
+			Long memberUID = memberRepository.getMemberIdById(memberId);
 			cartRepository.addCart(memberUID, lectureId);
 		} catch (Exception e){
 			e.printStackTrace();
@@ -57,7 +57,7 @@ public class CartService implements ICartService{
 	@Override
 	public ResponseEntity<ResponseDto> deleteCarts(String memberId, List<Long> cartIds) {
 		try {
-			String memberUID = memberRepository.getMemberIdById(memberId);
+			Long memberUID = memberRepository.getMemberIdById(memberId);
 			for (Long cartId : cartIds) {
 				String dbMemberId = cartRepository.getMemberIdbyCartId(cartId);
 			
