@@ -7,10 +7,11 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
 import com.example.myapp.member.model.Member;
+import com.example.myapp.member.model.MemberResponse;
 
 @Repository
 @Mapper
-public interface IMemberRepository {
+public interface IMemberRepository{
 
 	void insertMember(Member member) ;
 	Member selectMember(String userid);
@@ -28,4 +29,9 @@ public interface IMemberRepository {
 	void deleteMember(String id);
 
 	String getMemberIdById(String memberId);
+	
+	List<MemberResponse> getAllMembers();
+	void forceDeleteMember(Long memberId);
+	void deleteAllMembers();
+	
 }
