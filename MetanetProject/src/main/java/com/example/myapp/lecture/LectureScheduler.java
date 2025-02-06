@@ -1,14 +1,11 @@
 package com.example.myapp.lecture;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.example.myapp.common.response.ResponseDto;
 import com.example.myapp.lecture.dao.ILectureRepository;
 import com.example.myapp.lecture.model.LectureReminderDto;
 import com.example.myapp.lecture.model.LectureScheduled;
@@ -35,8 +32,8 @@ public class LectureScheduler {
 	    for (LectureScheduled scheduled : schedules) {
 	        try {
 	        	log.info(scheduled.getEmail() + " and " + scheduled.getSchedule());
-	        	// 외부 호출로 비동기 처리
-	            CompletableFuture<ResponseEntity<ResponseDto>> future = emailService.sendEmail("lecture_schedule", scheduled.getEmail(), scheduled.getSchedule());
+
+	        	emailService.sendEmail("lecture_schedule", scheduled.getEmail(), scheduled.getSchedule());
 	        } catch (MessagingException e) {
 	            e.printStackTrace();
 	        }
@@ -49,7 +46,7 @@ public class LectureScheduler {
         List<LectureReminderDto> lectures = lectureRepository.getLecturesStartingIn30Minutes();
         for (LectureReminderDto lecture : lectures) {
         	try {
-	            CompletableFuture<ResponseEntity<ResponseDto>> future = emailService.sendEmail("lecture_reminder", lecture.getEmail(), lecture);
+	            emailService.sendEmail("lecture_reminder", lecture.getEmail(), lecture);
 	        } catch (MessagingException e) {
 	            e.printStackTrace();
 	        }
