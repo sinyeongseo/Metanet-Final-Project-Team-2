@@ -12,18 +12,30 @@ import org.springframework.http.ResponseEntity;
 
 public interface IMemberService {
 	// 인증 코드 이메일 발송
-	ResponseEntity<ResponseDto> sendEmail(String email) throws MessagingException;
-	
+	ResponseEntity<ResponseDto> sendEmail(String type, String email) throws MessagingException;
+
 	// 코드 검증
 	ResponseEntity<ResponseDto> verifyEmailCode(String email, String code);
-	
-	//회원가입
-	void insertMember(Member member) ;
-	
-	//로그인
+
+	// 회원가입
+	void insertMember(Member member);
+
+	// 로그인
 	JwtToken loginService(Member member);
-	
-	//id로 조회하기
+
+	// id로 조회하기
 	Optional<Member> findById(String id);
+
+	boolean findByEmail(String email);
+
+	void resetPw(String email, String password);
 	
+	String checkRefreshToken(String refreshToken);
+	
+	boolean revokeRefreshToken(String refreshToken);
+	
+	
+	boolean checkRefreshTokenValidity(String refreshToken);
+
+	boolean deleteMemberByToken(String refreshToken);
 }
