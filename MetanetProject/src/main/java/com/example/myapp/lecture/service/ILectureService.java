@@ -1,6 +1,7 @@
 package com.example.myapp.lecture.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.example.myapp.lecture.model.Lecture;
 import com.example.myapp.lecture.model.LectureFile;
@@ -23,11 +24,27 @@ public interface ILectureService {
 
     void setRefundStatus(LectureId lectureId);
 
-    void registerLectures(Lecture lecture);
+    Long registerLectures(Lecture lecture);
 
     void updateLectures(Lecture lecture);
 
     void deleteLectures(Long lectureId, Long memberId);
 
     Long getMemberIdById(String memberId);
+
+    Long getLectureMaxId();
+
+    List<LectureFile> getLectureFiles(Long lectureId);
+
+    void insertLectureTags(Map<String, Object> params);
+
+    void deleteLectureTags(Map<String, Object> params);
+
+    List<Long> getExistingTags(Long lectureId);
+
+    void updateLectureTags(Long lectureId, String tags);
+
+    void buyLecture(Map<String, Long> params);
+
+    Boolean checkBeforeBuyLecture(Map<String, Long> params);
 }
