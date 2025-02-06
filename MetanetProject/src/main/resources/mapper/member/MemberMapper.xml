@@ -41,7 +41,7 @@
 		UPDATE members SET deleted = 1 WHERE id =#{id}	
 	</update>
 
-	<select id="getMemberIdById" parameterType="string" resultType="string">
+	<select id="getMemberIdById" parameterType="string" resultType="long">
 		<![CDATA[
 			SELECT member_id
 			FROM members
