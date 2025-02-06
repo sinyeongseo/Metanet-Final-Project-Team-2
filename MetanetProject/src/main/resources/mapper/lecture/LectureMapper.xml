@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    "../mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.myapp.lecture.dao.ILectureRepository">
 
@@ -224,5 +224,38 @@
     </select>
 
     
+	
+	<select id="findTodayLectures" resultType="com.example.myapp.lecture.model.LectureScheduled">
+	<![CDATA[
+		SELECT
+		    m.email,
+		    GROUP_CONCAT(
+		        ll.title, ' (', 
+		        DATE_FORMAT(ll.start_time, '%H:%i'), ' ~ ', 
+		        DATE_FORMAT(ll.end_time, '%H:%i'), ')'
+		        SEPARATOR '\n'
+		    ) AS schedule
+		FROM lecture_lists ll
+		JOIN lectures l ON ll.lecture_id = l.lecture_id
+		JOIN members m ON ll.member_id = m.member_id
+		WHERE DATE(ll.start_time) = CURDATE()
+		GROUP BY m.email;
+	]]>	
+	</select>
+	
+	<select id="getLecturesStartingIn30Minutes" resultType="com.example.myapp.lecture.model.LectureReminderDto">
+	<![CDATA[
+		SELECT 
+		    m.email, 
+		    l.title AS title,
+		    DATE_FORMAT(ll.start_time, '%Y년 %c월 %e일 %p %l시 %i분') AS startTime,
+		    l.link AS link
+		FROM attends a
+		JOIN members m ON a.member_id = m.member_id
+		JOIN lectures l ON a.lecture_id = l.lecture_id
+		JOIN lecture_lists ll ON l.lecture_id = ll.lecture_id
+		WHERE DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 30 MINUTE), '%Y-%m-%d %H:%i') = DATE_FORMAT(ll.start_time, '%Y-%m-%d %H:%i');
+	]]>	
+	</select>
 	
 </mapper>
