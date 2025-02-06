@@ -6,9 +6,34 @@
 
 	<select id="getAllLectures" resultType="com.example.myapp.lecture.model.Lecture">
 	<![CDATA[
-		SELECT member_id as memberId, title, profile, description, description_pic as descriptionPic, category, price, status, link, likes, limit_student as limitStudent, deadline_time as deadlineTime, lectures_date as lecturesDate, start_date as startDate,  end_date as endDate, deleted
-		FROM lectures
-		WHERE deleted = 0
+        SELECT 
+            l.lecture_id AS lectureId,
+            l.member_id AS memberId,
+            l.title,
+            l.profile,
+            l.description,
+            l.description_pic AS descriptionPic,
+            l.category,
+            l.price,
+            l.status,
+            l.link,
+            l.likes,
+            l.limit_student AS limitStudent,
+            l.deadline_time AS deadlineTime,
+            l.lectures_date AS lecturesDate,
+            l.start_date AS startDate,
+            l.end_date AS endDate,
+            l.deleted,
+            GROUP_CONCAT(t.tag_name ORDER BY t.tag_name SEPARATOR ', ') AS tags,
+            (SELECT COUNT(a.member_id) FROM attends a WHERE a.lecture_id = l.lecture_id) AS enrolledStudents,
+            (l.limit_student - (SELECT COUNT(a.member_id) FROM attends a WHERE a.lecture_id = l.lecture_id)) AS leftSpace
+        FROM lectures l
+        LEFT JOIN lectures_tags lt ON l.lecture_id = lt.lecture_id
+        LEFT JOIN tags t ON lt.tag_id = t.tag_id
+        WHERE l.deleted = 0
+        GROUP BY l.lecture_id
+        ORDER BY l.lectures_date DESC;
+
 	]]>
 	</select>
 
@@ -53,7 +78,7 @@
 	</update>
 
 
-	<insert id="registerLectures" parameterType="com.example.myapp.lecture.model.Lecture">
+	<insert id="registerLectures" parameterType="com.example.myapp.lecture.model.Lecture" useGeneratedKeys="true" keyProperty="lectureId">
 	<![CDATA[
 		INSERT INTO lectures (
             member_id, title, profile, description, description_pic, category, 
@@ -65,9 +90,10 @@
 	]]>
 	</insert>
 
-	<update id="updateLectures" parameterType="com.example.myapp.lecture.model.Lecture">
+<update id="updateLectures" parameterType="com.example.myapp.lecture.model.Lecture">
     <![CDATA[
         UPDATE lectures
+    ]]>
     <set>
         <if test="title != null"> title = #{title}, </if>
         <if test="profileUrl != null"> profile = #{profileUrl}, </if>
@@ -84,9 +110,11 @@
         <if test="endDate != null"> end_date = #{endDate}, </if>
         <if test="deleted != null"> deleted = #{deleted} </if>
     </set>
+    <![CDATA[
         WHERE lecture_id = #{lectureId}
     ]]>
-	</update>
+</update>
+
 
 	<select id="getMemberIdById" parameterType="String" resultType="Long">
   	<![CDATA[
@@ -106,10 +134,39 @@
     <select id="getLectureDetail" parameterType="Long" resultType="com.example.myapp.lecture.model.Lecture">
         <![CDATA[
             SELECT 
-                member_id as memberId, title, profile, description, description_pic as descriptionPic, category, price, status, link, likes, limit_student as limitStudent, deadline_time as deadlineTime, lectures_date as lecturesDate, start_date as startDate,  end_date as endDate, deleted
-            FROM lectures
-            WHERE lecture_id = #{lectureId}
+                l.lecture_id AS lectureId,
+                l.member_id AS memberId,
+                l.title,
+                l.profile,
+                l.description,
+                l.description_pic AS descriptionPic,
+                l.category,
+                l.price,
+                l.status,
+                l.link,
+                l.likes,
+                l.limit_student AS limitStudent,
+                l.deadline_time AS deadlineTime,
+                l.lectures_date AS lecturesDate,
+                l.start_date AS startDate,
+                l.end_date AS endDate,
+                l.deleted,
+                GROUP_CONCAT(t.tag_name ORDER BY t.tag_name SEPARATOR ', ') AS tags,
+                (SELECT COUNT(a.member_id) FROM attends a WHERE a.lecture_id = l.lecture_id) AS enrolledStudents,
+                (l.limit_student - (SELECT COUNT(a.member_id) FROM attends a WHERE a.lecture_id = l.lecture_id)) AS leftSpace
+            FROM lectures l
+            LEFT JOIN lectures_tags lt ON l.lecture_id = lt.lecture_id
+            LEFT JOIN tags t ON lt.tag_id = t.tag_id
+            WHERE l.deleted = 0 AND l.lecture_id = #{lectureId}
+            GROUP BY l.lecture_id
+            ORDER BY l.lectures_date DESC;
         ]]>
+    </select>
+
+    <select id="getLectureMaxId" resultType="java.lang.Long">
+    <![CDATA[
+        SELECT MAX(lecture_id) FROM lectures
+    ]]>
     </select>
 
 	<delete id="forceDeleteLecture">
@@ -123,5 +180,49 @@
 		DELETE FROM lectures
 	]]>
 	</delete>
+
+    <select id="getLectureFiles" parameterType="Long" resultType="com.example.myapp.lecture.model.LectureFile">
+    <![CDATA[
+        SELECT file_url as fileUrl FROM lecture_files WHERE lecture_id = #{lectureId}
+    ]]>
+    </select>
+
+    <select id="getExistingTags" parameterType="Long" resultType="Long">
+    <![CDATA[
+        SELECT tag_id FROM lectures_tags WHERE lecture_id = #{lectureId}
+    ]]>
+    </select>
+
+    <insert id="insertLectureTags" parameterType="map">
+
+        INSERT INTO lectures_tags (lecture_id, tag_id)
+        VALUES 
+        <foreach collection="tagIds" item="tagId" separator=",">
+            (#{lectureId}, #{tagId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteLectureTags" parameterType="map">
+        DELETE FROM lectures_tags
+        WHERE lecture_id = #{lectureId} 
+        AND tag_id IN 
+        <foreach collection="tagIds" item="tagId" separator="," open="(" close=")">
+            #{tagId}
+        </foreach>
+    </delete>
+
+    <insert id="buyLecture" parameterType="map">
+    <![CDATA[
+        INSERT INTO attends ( member_id , lecture_id ) VALUES ( #{ memberId } , #{ lectureId } )
+    ]]>
+    </insert>
+
+    <select id="checkBeforeBuyLecture" parameterType="map" resultType="boolean">
+    <![CDATA[
+        SELECT COUNT(*) > 0 FROM attends WHERE member_id = #{memberId} AND lecture_id = #{lectureId}
+    ]]>
+    </select>
+
+    
 	
 </mapper>

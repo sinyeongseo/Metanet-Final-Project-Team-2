@@ -12,6 +12,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Lecture {
+    private Long lectureId;
     private Long memberId;
     private String title;
     private String profile;
@@ -25,9 +26,12 @@ public class Lecture {
     private String link;
     private Integer likes;
     private Integer limitStudent;
+    private Integer enrolledStudents;
+    private Integer leftSpace;
     private LocalDateTime deadlineTime;
     private LocalDateTime lecturesDate;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private Boolean deleted;
+    private String tags;
 }

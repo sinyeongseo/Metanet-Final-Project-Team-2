@@ -1,7 +1,13 @@
 package com.example.myapp.lecture.service;
 
+import java.text.Collator;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.jsoup.select.Collector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,8 +38,8 @@ public class LectureService implements ILectureService {
     }
 
     @Override
-    public void registerLectures(Lecture lecture) {
-        lectureDao.registerLectures(lecture);
+    public Long registerLectures(Lecture lecture) {
+        return lectureDao.registerLectures(lecture);
 
     }
 
@@ -75,6 +81,74 @@ public class LectureService implements ILectureService {
     @Override
     public void updateLikeLectures(Long memberId, Long lectureId, boolean exist) {
         lectureDao.updateLikeLectures(memberId, lectureId, exist);
+    }
+
+    @Override
+    public Long getLectureMaxId() {
+        return lectureDao.getLectureMaxId();
+    }
+
+    @Override
+    public List<LectureFile> getLectureFiles(Long lectureId) {
+        return lectureDao.getLectureFiles(lectureId);
+    }
+
+    @Override
+    public void insertLectureTags(Map<String, Object> params) {
+        lectureDao.insertLectureTags(params);
+    }
+
+    @Override
+    public void deleteLectureTags(Map<String, Object> params) {
+        lectureDao.deleteLectureTags(params);
+    }
+
+    @Override
+    public List<Long> getExistingTags(Long lectureId) {
+        return lectureDao.getExistingTags(lectureId);
+    }
+
+    @Override
+    public void updateLectureTags(Long lectureId, String tags) {
+        List<Long> existTags = lectureDao.getExistingTags(lectureId);
+
+        List<Long> insertedTags = Arrays.stream(tags.replace(" ", "").split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+
+        // 지워야 할 태그 목록록
+        List<Long> tagsToDelete = existTags.stream()
+                .filter(tag -> !insertedTags.contains(tag))
+                .collect(Collectors.toList());
+
+        // 입력해야 할 태그 목록
+        List<Long> tagsToInsert = insertedTags.stream()
+                .filter(tag -> !existTags.contains(tag))
+                .collect(Collectors.toList());
+
+        if (!tagsToDelete.isEmpty()) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("lectureId", lectureId);
+            params.put("tagIds", tagsToDelete);
+            lectureDao.deleteLectureTags(params);
+        }
+
+        if (!tagsToInsert.isEmpty()) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("lectureId", lectureId);
+            params.put("tagIds", tagsToInsert);
+            lectureDao.insertLectureTags(params);
+        }
+    }
+
+    @Override
+    public void buyLecture(Map<String, Long> params) {
+        lectureDao.buyLecture(params);
+    }
+
+    @Override
+    public Boolean checkBeforeBuyLecture(Map<String, Long> params) {
+        return lectureDao.checkBeforeBuyLecture(params);
     }
 
 }
