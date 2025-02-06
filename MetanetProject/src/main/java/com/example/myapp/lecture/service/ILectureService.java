@@ -8,7 +8,7 @@ import com.example.myapp.lecture.model.LectureFile;
 import com.example.myapp.lecture.model.LectureId;
 
 public interface ILectureService {
-    List<Lecture> getAllLectures();
+    Map<String, List<Lecture>> getAllLectures();
 
     Lecture getLectureDetail(Long lectureId);
 

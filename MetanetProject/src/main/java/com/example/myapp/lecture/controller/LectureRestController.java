@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,7 +52,7 @@ public class LectureRestController {
     @GetMapping("/all")
     public ResponseEntity<ResponseDto> getAllLectures() {
 
-        List<Lecture> lecture = new ArrayList<Lecture>();
+        Map<String, List<Lecture>> lecture = new HashMap<String, List<Lecture>>();
         try {
             lecture = lectureService.getAllLectures();
         } catch (Exception e) {
@@ -142,7 +141,6 @@ public class LectureRestController {
                 lectureFile.setFileUrl(url);
                 lectureService.lectureFileUpload(lectureFile);
             }
-            System.out.println(urls);
             ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, urls);
             return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
@@ -252,9 +250,6 @@ public class LectureRestController {
 
             // 강의 생성
             Long lectureId = lectureService.registerLectures(lecture);
-            Lecture afterLecture = new Lecture();
-            afterLecture.setMemberId(member_id);
-            afterLecture.setLectureId(lecture.getLectureId());
             // 강의 생성 후 태그 생성
             if (lecture.getTags() != null && !lecture.getTags().isEmpty()) {
                 lectureService.updateLectureTags(lecture.getLectureId(), lecture.getTags());
@@ -263,27 +258,26 @@ public class LectureRestController {
             if (profileFile != null && !profileFile.isEmpty()) {
                 String url = new String();
                 try {
-                    url = s3FileUploader.uploadFile(profileFile, "lectures", "profile", afterLecture.getLectureId());
-                    afterLecture.setProfileUrl(url);
+                    url = s3FileUploader.uploadFile(profileFile, "lectures", "profile", lecture.getLectureId());
+                    lecture.setProfileUrl(url);
                 } catch (Exception e) {
                     return ResponseDto.serverError();
                 }
-                afterLecture.setProfileUrl(url);
+                lecture.setProfileUrl(url);
             }
             if (descriptionPicFile != null && !descriptionPicFile.isEmpty()) {
                 String url = new String();
                 try {
                     url = s3FileUploader.uploadFile(descriptionPicFile, "lectures", "description",
-                            afterLecture.getLectureId());
-                    afterLecture.setDescriptionPicUrl(url);
+                            lecture.getLectureId());
+                    lecture.setDescriptionPicUrl(url);
                 } catch (Exception e) {
                     return ResponseDto.serverError();
                 }
-                afterLecture.setDescriptionPicUrl(url);
+                lecture.setDescriptionPicUrl(url);
             }
-            lectureService.updateLectures(afterLecture);
+            lectureService.updateLectures(lecture);
         } catch (Exception e) {
-            System.out.println(lecture.toString());
             return ResponseDto.databaseError();
         }
         ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
@@ -365,7 +359,6 @@ public class LectureRestController {
             }
 
         } catch (Exception e) {
-            System.out.println(lecture.toString());
             return ResponseDto.databaseError();
         }
 
@@ -428,7 +421,6 @@ public class LectureRestController {
             }
 
         } catch (Exception e) {
-            System.out.println(lecture.toString());
             return ResponseDto.databaseError();
         }
 

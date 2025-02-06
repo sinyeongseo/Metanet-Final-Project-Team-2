@@ -17,6 +17,10 @@ import com.example.myapp.lecture.model.LectureScheduled;
 public interface ILectureRepository {
     List<Lecture> getAllLectures();
 
+    List<Lecture> getRankByDeadDateLectures();
+
+    List<Lecture> getRankByLikeLectures();
+
     Lecture getLectureDetail(Long lectureId);
 
     boolean checkLikeLectures(Long memberId, Long lectureId);
@@ -57,8 +61,9 @@ public interface ILectureRepository {
 
     Boolean checkBeforeBuyLecture(Map<String, Long> params);
 
-    
+    void insertPayLog(Map<String, Long> params);
+
     List<LectureScheduled> findTodayLectures();
-    
+
     List<LectureReminderDto> getLecturesStartingIn30Minutes();
 }
