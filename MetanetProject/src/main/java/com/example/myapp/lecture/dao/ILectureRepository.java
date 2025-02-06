@@ -34,4 +34,8 @@ public interface ILectureRepository {
     void deleteLectures(Long lectureId, Long memberId);
 
     Long getMemberIdById(String memberId);
+
+    void forceDeleteLecture(Long lectureId);
+    
+    void deleteAllLectures();
 }

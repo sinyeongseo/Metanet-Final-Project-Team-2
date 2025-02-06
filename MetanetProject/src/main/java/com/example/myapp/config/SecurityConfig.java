@@ -35,6 +35,7 @@ public class SecurityConfig {
 				.requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
 				.requestMatchers("/auth/**").permitAll()
 				.requestMatchers("/email/**").permitAll()
+	            .requestMatchers("/admin/**").hasAnyRole("Admin")
 				.requestMatchers("/lecture/all", "lecture/{lecture_id}", "lecture/like/**").permitAll()
 				// .requestMatchers("/board/test").hasAnyRole("User", "Teacher")
 				.anyRequest().authenticated() // 모든 요청은 인증이 필요
