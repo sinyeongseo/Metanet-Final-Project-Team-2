@@ -26,12 +26,12 @@ public class ResponseDto<T> {
         this.message = message;
         this.data = data;
     }
-    
+
     // 200
     public static ResponseEntity<ResponseDto> success() {
-    	ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
-    	return ResponseEntity.ok(responseBody);
-    	
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+        return ResponseEntity.ok(responseBody);
+
     }
 
     // HTTP Status 400
@@ -61,13 +61,13 @@ public class ResponseDto<T> {
     }
 
     public static ResponseEntity<ResponseDto> notSamePassword() {
-    	ResponseDto responseBody = new ResponseDto(ResponseCode.NOT_SAME_PW, ResponseMessage.NOT_SAME_PW);
-    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+        ResponseDto responseBody = new ResponseDto(ResponseCode.NOT_SAME_PW, ResponseMessage.NOT_SAME_PW);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
-    
+
     public static ResponseEntity<ResponseDto> nullInputValue() {
-    	ResponseDto responseBody = new ResponseDto(ResponseCode.NULL_INTPUT_VALUE, ResponseMessage.NULL_INTPUT_VALUE);
-    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+        ResponseDto responseBody = new ResponseDto(ResponseCode.NULL_INTPUT_VALUE, ResponseMessage.NULL_INTPUT_VALUE);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
 
     // HTTP Status 401
@@ -102,7 +102,6 @@ public class ResponseDto<T> {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(responseBody);
     }
 
-
     // HTTP Status 500
     public static ResponseEntity<ResponseDto> mailSendFail() {
         ResponseDto responseBody = new ResponseDto(ResponseCode.MAIL_FAIL, ResponseMessage.MAIL_FAIL);
@@ -119,9 +118,18 @@ public class ResponseDto<T> {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBody);
     }
 
-
     public static ResponseEntity<ResponseDto> serverError() {
         ResponseDto responseBody = new ResponseDto(ResponseCode.SERVER_ERROR, ResponseMessage.SERVER_ERROR);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBody);
+    }
+
+    public static ResponseEntity<ResponseDto> alreadyBuyed() {
+        ResponseDto responseBody = new ResponseDto(ResponseCode.ALREADY_BUYED, ResponseMessage.ALREADY_BUYED);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+    }
+
+    public static ResponseEntity<ResponseDto> cantRefund() {
+        ResponseDto responseBody = new ResponseDto(ResponseCode.DENY_REFUND, ResponseMessage.DENY_REFUND);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
 }

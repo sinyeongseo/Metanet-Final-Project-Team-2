@@ -10,8 +10,8 @@ public interface ResponseCode {
     String DUPLICATE_EMAIL = "DE";
     String DUPLICATE_ID = "DI";
     String VALIDATION_FAILED = "VF";
-    String NOT_SAME_PW="NSP";
-    String NULL_INTPUT_VALUE ="NIV";
+    String NOT_SAME_PW = "NSP";
+    String NULL_INTPUT_VALUE = "NIV";
 
     // HTTP Status 401
     String SIGN_IN_FAILED = "SF";
@@ -28,4 +28,8 @@ public interface ResponseCode {
     String REDIS_ERROR = "RE";
     String DATABASE_ERROR = "DBE";
     String SERVER_ERROR = "SE";
+
+    //// lecture buy 기능
+    String ALREADY_BUYED = "NB";
+    String DENY_REFUND = "DR";
 }
