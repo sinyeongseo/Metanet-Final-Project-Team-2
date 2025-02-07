@@ -127,4 +127,9 @@ public class ResponseDto<T> {
         ResponseDto responseBody = new ResponseDto(ResponseCode.ALREADY_BUYED, ResponseMessage.ALREADY_BUYED);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
+
+    public static ResponseEntity<ResponseDto> cantRefund() {
+        ResponseDto responseBody = new ResponseDto(ResponseCode.DENY_REFUND, ResponseMessage.DENY_REFUND);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+    }
 }

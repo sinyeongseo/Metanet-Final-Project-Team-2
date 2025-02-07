@@ -8,7 +8,7 @@ import com.example.myapp.lecture.model.LectureFile;
 import com.example.myapp.lecture.model.LectureId;
 
 public interface ILectureService {
-    List<Lecture> getAllLectures();
+    Map<String, List<Lecture>> getAllLectures();
 
     Lecture getLectureDetail(Long lectureId);
 
@@ -45,6 +45,10 @@ public interface ILectureService {
     void updateLectureTags(Long lectureId, String tags);
 
     void buyLecture(Map<String, Long> params);
+
+    Boolean checkCanRefund(Map<String, Long> params);
+
+    void payRefund(Map<String, Long> params);
 
     Boolean checkBeforeBuyLecture(Map<String, Long> params);
 }

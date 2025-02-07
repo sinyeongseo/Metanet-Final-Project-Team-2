@@ -31,4 +31,5 @@ public interface ResponseMessage {
 
     // lecture buy 기능
     String ALREADY_BUYED = "already buyed lecture, no need to buy";
+    String DENY_REFUND = "You cannot refund. Please contact us if you did not download the file.";
 }

@@ -1,13 +1,11 @@
 package com.example.myapp.lecture.service;
 
-import java.text.Collator;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.jsoup.select.Collector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +21,14 @@ public class LectureService implements ILectureService {
     ILectureRepository lectureDao;
 
     @Override
-    public List<Lecture> getAllLectures() {
-        return lectureDao.getAllLectures();
+    public Map<String, List<Lecture>> getAllLectures() {
+
+        Map<String, List<Lecture>> lectures = new HashMap<String, List<Lecture>>();
+
+        lectures.put("getAll", lectureDao.getAllLectures());
+        lectures.put("getRankByDeadDate", lectureDao.getRankByDeadDateLectures());
+        lectures.put("getRankByLike", lectureDao.getRankByLikeLectures());
+        return lectures;
     }
 
     @Override
@@ -144,11 +148,22 @@ public class LectureService implements ILectureService {
     @Override
     public void buyLecture(Map<String, Long> params) {
         lectureDao.buyLecture(params);
+        lectureDao.insertPayLog(params);
     }
 
     @Override
     public Boolean checkBeforeBuyLecture(Map<String, Long> params) {
         return lectureDao.checkBeforeBuyLecture(params);
+    }
+
+    @Override
+    public Boolean checkCanRefund(Map<String, Long> params) {
+        return lectureDao.checkCanRefund(params);
+    }
+
+    @Override
+    public void payRefund(Map<String, Long> params) {
+        lectureDao.payRefund(params);
     }
 
 }
