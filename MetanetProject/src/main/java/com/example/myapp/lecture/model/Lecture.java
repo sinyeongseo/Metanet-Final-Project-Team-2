@@ -30,4 +30,5 @@ public class Lecture {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private Boolean deleted;
+    private Long LectureId;
 }

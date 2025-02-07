@@ -19,6 +19,7 @@ import com.example.myapp.lecture.model.Lecture;
 import com.example.myapp.lecture.model.LectureFile;
 import com.example.myapp.lecture.model.LectureId;
 import com.example.myapp.lecture.service.ILectureService;
+import com.example.myapp.util.GetAuthenUser;
 import com.example.myapp.util.RegexUtil;
 import com.example.myapp.util.S3FileUploader;
 
@@ -81,18 +82,12 @@ public class LectureRestController {
     @PostMapping("/like/{lecture_id}")
     public ResponseEntity<ResponseDto> likeLectures(@PathVariable("lecture_id") Long lectureId) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        String member_id = "";
-
-        if (authentication != null) {
-            // 현재 인증된 사용자 정보
-            member_id = authentication.getName();
-            log.info(member_id);
-        }
-        if (member_id == null)
-            return ResponseDto.noAuthentication();
-
+    	String member_id =  GetAuthenUser.getAuthenUser();
+		// 인증되지 않은 경우는 바로 처리
+	    if (member_id == null) {
+	        return ResponseDto.noAuthentication();
+	    }
+	    
         Long memberId = lectureService.getMemberIdById(member_id);
 
         boolean exist = lectureService.checkLikeLectures(memberId, lectureId);
@@ -117,17 +112,11 @@ public class LectureRestController {
             @PathVariable("lecture_id") Long lectureId,
             @RequestParam("files") List<MultipartFile> files) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        String memberId = "";
-
-        if (authentication != null) {
-            // 현재 인증된 사용자 정보
-            memberId = authentication.getName();
-            log.info(memberId);
-        }
-        if (memberId == null)
-            return ResponseDto.noAuthentication();
+    	String memberId =  GetAuthenUser.getAuthenUser();
+		// 인증되지 않은 경우는 바로 처리
+	    if (memberId == null) {
+	        return ResponseDto.noAuthentication();
+	    }
 
         Long member_id = lectureService.getMemberIdById(memberId);
 
@@ -151,20 +140,15 @@ public class LectureRestController {
     // 환불 불가로 변경 기능 Json -- 고범준
     @SuppressWarnings({ "rawtypes" })
     @PutMapping("/{lecture_id}/refund-status")
-    public ResponseEntity<ResponseDto> setRefundStatus(@RequestBody Map<String, Long> request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        String memberId = "";
+    public ResponseEntity<ResponseDto> setRefundStatus(@RequestBody Map<String, Long> request) {       
+       
         Long lectureId = request.get("lectureId");
 
-        if (authentication != null) {
-            // 현재 인증된 사용자 정보
-            memberId = authentication.getName();
-            log.info(memberId);
-        }
-        if (memberId == null)
-            return ResponseDto.noAuthentication();
-
+        String memberId =  GetAuthenUser.getAuthenUser();
+		// 인증되지 않은 경우는 바로 처리
+	    if (memberId == null) {
+	        return ResponseDto.noAuthentication();
+	    }
         Long member_id = lectureService.getMemberIdById(memberId);
 
         LectureId ids = new LectureId(member_id, lectureId);
@@ -183,18 +167,12 @@ public class LectureRestController {
     public ResponseEntity<ResponseDto> lecturelikeLectures(@ModelAttribute Lecture lecture,
             @RequestParam(value = "profile", required = false) MultipartFile profile,
             @RequestParam(value = "descriptionPic", required = false) MultipartFile descriptionPic) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        String memberId = "";
-
-        if (authentication != null) {
-            // 현재 인증된 사용자 정보
-            memberId = authentication.getName();
-            log.info(memberId);
-        }
-        if (memberId == null)
-            return ResponseDto.noAuthentication();
-
+    	String memberId =  GetAuthenUser.getAuthenUser();
+		// 인증되지 않은 경우는 바로 처리
+	    if (memberId == null) {
+	        return ResponseDto.noAuthentication();
+	    }
+	    
         Long member_id = lectureService.getMemberIdById(memberId);
         try {
             lecture.setMemberId(member_id);
@@ -255,16 +233,12 @@ public class LectureRestController {
             @RequestParam(value = "profile", required = false) MultipartFile profile,
             @RequestParam(value = "descriptionPic", required = false) MultipartFile descriptionPic) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String memberId = "";
-        if (authentication != null) {
-            // 현재 인증된 사용자 정보
-            memberId = authentication.getName();
-            log.info(memberId);
-        }
-        if (memberId == null) {
-            return ResponseDto.noAuthentication();
-        }
+    	String memberId =  GetAuthenUser.getAuthenUser();
+		// 인증되지 않은 경우는 바로 처리
+	    if (memberId == null) {
+	        return ResponseDto.noAuthentication();
+	    }
+	    
 
         Long member_id = lectureService.getMemberIdById(memberId);
 
@@ -330,18 +304,14 @@ public class LectureRestController {
     @SuppressWarnings({ "rawtypes" })
     @DeleteMapping("/delete")
     public ResponseEntity<ResponseDto> deleteLectures(@RequestBody Map<String, Long> request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        String memberId = "";
+      
         Long lecture_id = request.get("lectureId");
-
-        if (authentication != null) {
-            // 현재 인증된 사용자 정보
-            memberId = authentication.getName();
-            log.info(memberId);
-        }
-        if (memberId == null)
-            return ResponseDto.noAuthentication();
+        String memberId =  GetAuthenUser.getAuthenUser();
+		// 인증되지 않은 경우는 바로 처리
+	    if (memberId == null) {
+	        return ResponseDto.noAuthentication();
+	    }
+	    
 
         Long member_id = lectureService.getMemberIdById(memberId);
         try {
