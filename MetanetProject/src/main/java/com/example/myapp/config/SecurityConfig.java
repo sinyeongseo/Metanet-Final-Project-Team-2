@@ -2,6 +2,7 @@ package com.example.myapp.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -35,6 +36,13 @@ public class SecurityConfig {
 				.requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
 				.requestMatchers("/auth/**").permitAll()
 				.requestMatchers("/email/**").permitAll()
+				.requestMatchers("/lecture/all", "lecture/{lecture_id}", "lecture/like/**",
+						"lecture/{review_id}/reviews")
+				.permitAll()
+				.requestMatchers(HttpMethod.GET, "/lectures/*/questions").permitAll()
+	            .requestMatchers(HttpMethod.GET, "/lectures/*/questions/*").permitAll()
+				.requestMatchers("/lectures/**").hasAnyRole("Student", "Teacher", "Admin")
+	            .requestMatchers("/admin/**").hasAnyRole("Admin")
 				.requestMatchers("/lecture/all", "lecture/{lecture_id}", "lecture/like/**").permitAll()
 				// .requestMatchers("/board/test").hasAnyRole("User", "Teacher")
 				.anyRequest().authenticated() // 모든 요청은 인증이 필요

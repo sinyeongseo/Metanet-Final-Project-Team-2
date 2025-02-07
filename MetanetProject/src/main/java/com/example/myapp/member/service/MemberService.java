@@ -10,8 +10,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -24,7 +22,6 @@ import com.example.myapp.common.response.ResponseMessage;
 import com.example.myapp.jwt.JwtTokenProvider;
 import com.example.myapp.jwt.model.JwtToken;
 import com.example.myapp.jwt.model.RefreshToken;
-import com.example.myapp.jwt.service.CustomUserDetailsService;
 import com.example.myapp.jwt.service.RedisTokenService;
 import com.example.myapp.member.dao.IMemberRepository;
 import com.example.myapp.member.model.Member;
@@ -79,27 +76,29 @@ public class MemberService implements IMemberService {
 	}
 
 	// 이메일 내용 초기화
-	private String setContext(String code) {
+	private String setContext(Object data, String templateName) {
 		Context context = new Context();
 		TemplateEngine templateEngine = new TemplateEngine();
 		ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
 
-		context.setVariable("code", code);
+		if ("lecture/lecture_schedule_mail".equals(templateName) || "lecture/lecture_reminder".equals(templateName)) {
+			context.setVariable("lectures", data);
+		} else if ("member/mail".equals(templateName)) {
+			context.setVariable("code", data);
+		} 
 
-		templateResolver.setPrefix("templates/member/");
+		templateResolver.setPrefix("templates/");
 		templateResolver.setSuffix(".html");
 		templateResolver.setTemplateMode(TemplateMode.HTML);
 		templateResolver.setCacheable(false);
 
 		templateEngine.setTemplateResolver(templateResolver);
 
-		return templateEngine.process("mail", context);
+		return templateEngine.process(templateName, context);
 	}
 
 	// 이메일 폼 생성
-	private MimeMessage createEmailForm(String type, String email) throws MessagingException {
-		String authCode = createCode();
-
+	private MimeMessage createEmailForm(String type, String email, Object data) throws MessagingException {
 		MimeMessage message = javaMailSender.createMimeMessage();
 		message.addRecipients(MimeMessage.RecipientType.TO, email);
 		if (type.equals("join")) {
@@ -111,34 +110,68 @@ public class MemberService implements IMemberService {
 		}
 
 		message.setFrom(senderEmail);
-		message.setText(setContext(authCode), "utf-8", "html");
 
-		// Redis 에 해당 인증코드 인증 시간 설정
-		redisUtil.setDataExpire(email, authCode, 60 * 30L);
+		String subject;
+		String templateName;
+		Object templateData;
+
+		// 이메일 종류에 따른 템플릿 및 데이터 설정
+		if ("join".equals(type) || "password".equals(type)) {
+			subject = "join".equals(type) ? "[Metanet] 회원가입 이메일 인증번호입니다." : "[Metanet] 비밀번호 재발급 인증번호입니다.";
+			templateName = "member/mail";
+			String authCode = createCode();
+			templateData = authCode;
+			
+			// 인증 코드 Redis 저장
+			if (data instanceof String) {
+				redisUtil.setDataExpire(email, (String) authCode, 60 * 30L);
+			}
+
+		} else if ("lecture_schedule".equals(type)) {
+			subject = "[Metanet] 강의 일정 안내";
+			templateName = "lecture/lecture_schedule_mail";
+			templateData = data;
+			
+		} else if ("lecture_reminder".equals(type)) {
+			subject = "[Metanet] 강의 30분 전 안내 및 zoom 링크 제공";
+			templateName = "lecture/lecture_reminder";
+			templateData = data;
+		} else {
+			throw new MessagingException("올바른 이메일 타입이 아닙니다.");
+		}
+
+		message.setSubject(subject);
+		message.setText(setContext(templateData, templateName), "utf-8", "html");
 
 		return message;
 	}
 
 	@Override
-	public ResponseEntity<ResponseDto> sendEmail(String type, String email) {
+	public ResponseEntity<ResponseDto> sendEmail(String type, String email) throws MessagingException {
+		return sendEmail(type, email, null); // 기본 데이터 없이 호출
+	}
+
+	@Override
+	public ResponseEntity<ResponseDto> sendEmail(String type, String email, Object data) throws MessagingException{
 		try {
 			if (redisUtil.existData(email)) {
 				redisUtil.deleteData(email);
 			}
-		} catch (Exception e) {
+		} catch (Exception e) { 
+			e.printStackTrace();
 			return ResponseDto.redisError();
 		}
 
 		try {
-			MimeMessage emailForm = createEmailForm(type, email);
+			MimeMessage emailForm = createEmailForm(type, email, data);
 			javaMailSender.send(emailForm);
 		} catch (MessagingException e) {
+			e.printStackTrace();
 			return ResponseDto.mailSendFail();
 		}
-
-		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
-		return ResponseEntity.ok(responseBody);
+		return ResponseEntity.ok(new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS));
 	}
+
 
 	@Override
 	public ResponseEntity<ResponseDto> verifyEmailCode(String email, String code) {
