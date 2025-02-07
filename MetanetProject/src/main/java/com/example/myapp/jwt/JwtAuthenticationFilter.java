@@ -83,6 +83,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
    public class AcceptedUrl {
       public final static List<String> ACCEPTED_URL_LIST = List.of("/auth/join", "/auth/login", "/auth/password",
             "/auth/re-access-token", "/auth/delete","/email/send", "/email/verify", "/email/mail-password",
-            "/ws/**", "/queue/**", "/topic/**", "/user/**");
+            "/ws/**");
    }
 }
