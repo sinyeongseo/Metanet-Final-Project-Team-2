@@ -1,69 +1,85 @@
 package com.example.myapp.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.myapp.jwt.JwtAuthenticationFilter;
+import com.example.myapp.jwt.JwtTokenProvider;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-	@Autowired
-	JwtAuthenticationFilter authenticationFilter;
+	private final JwtTokenProvider jwtTokenProvider;
 
 	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		// Rest API이기 때문에 csrf 보안 사용 X
 		http.csrf((csrfConfig) -> csrfConfig.disable());
-//		http.formLogin(formLogin -> formLogin
-//				.loginPage("/member/login")
-//				.usernameParameter("userid")
-//				.defaultSuccessUrl("/"))
-//			.logout(logout -> logout
-//				.logoutUrl("/member/logout")
-//				.logoutSuccessUrl("/member/login")
-//				.invalidateHttpSession(true))
-		http.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/file/**").hasRole("ADMIN")
-				.requestMatchers("/board/**").hasAnyRole("USER", "ADMIN")
-				.requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-				.requestMatchers("/member/insert").permitAll()
-				.requestMatchers("/member/login").permitAll()
-				.requestMatchers("/**").permitAll());
-
-//		 Session 기반의 인증을 사용하지 않고 추후 JWT를 이용하여서 인증 예정
+		http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+		// JWT를 사용하기 때문에 세션 사용 비활성
 		http.sessionManagement((session) -> session
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-//		Spring Security JWT 필터 로드
-		http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
-		
-		return http.build();
+		// 인가 규칙 설정
+		http.authorizeHttpRequests(auth -> auth
+				.requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+				.requestMatchers("/auth/**").permitAll()
+				.requestMatchers("/email/**").permitAll()
+				.requestMatchers("/lecture/all", "lecture/{lecture_id}", "lecture/like/**",
+						"lecture/{review_id}/reviews")
+				.permitAll()
+				.requestMatchers(HttpMethod.GET, "/lectures/*/questions").permitAll()
+	            .requestMatchers(HttpMethod.GET, "/lectures/*/questions/*").permitAll()
+				.requestMatchers("/lectures/**").hasAnyRole("Student", "Teacher", "Admin")
+				.requestMatchers("/revenue").hasAnyRole("Teacher", "Admin")
+	            .requestMatchers("/admin/**").hasRole("Admin")
+				.requestMatchers("/lecture/all", "lecture/{lecture_id}", "lecture/like/**").permitAll()
+				.requestMatchers("/ws/**").permitAll()
+	            .requestMatchers("/user/**").permitAll()
+	            .requestMatchers("/topic/**", "/queue/**").permitAll()
+				// .requestMatchers("/board/test").hasAnyRole("User", "Teacher")
+				.anyRequest().authenticated() // 모든 요청은 인증이 필요
+		);
+
+		// JWT 인증을 위해 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
+		http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+
+		return http.build(); // 필터 체인 빌드
 	}
 
 	@Bean
-	@ConditionalOnMissingBean(UserDetailsService.class)
-	InMemoryUserDetailsManager userDetailsService() {
-		return new InMemoryUserDetailsManager(
-				User.withUsername("foo").password("{noop}demo").roles("ADMIN").build(),
-				User.withUsername("bar").password("{noop}demo").roles("USER").build(),
-				User.withUsername("ted").password("{noop}demo").roles("USER", "ADMIN").build());
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder(); // 비밀번호 암호화에 BCryptPasswordEncoder 사용
 	}
-
+	
 	@Bean
-	PasswordEncoder passwordEncoder() {
-		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-	}
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://127.0.0.1:5500", "http://localhost:8080", "https://bamjun.click:443"));
+        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }

@@ -1,54 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    "../mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.myapp.member.dao.IMemberRepository">
 
 	<insert id="insertMember" parameterType="com.example.myapp.member.model.Member">
-	<![CDATA[
-		INSERT INTO 
-			member (userid, name, password, phone, email) 
-		VALUES 
-			(#{userid}, #{name}, #{password}, #{phone}, #{email})
-	]]>
+		<![CDATA[
+			INSERT INTO 
+				members (id, name, password, phone, email, role, deleted, birth, profile, bank) 
+			VALUES 
+				(#{id}, #{name}, #{password}, #{phone}, #{email}, #{role}, 0, #{birth}, #{profile}, #{bank})
+		]]>
 	</insert>
 
-	<select id="selectMember" parameterType="string" resultType="com.example.myapp.member.model.Member">
-	<![CDATA[
-		SELECT userid,	name, password,	phone, email, role 
-		FROM   member 
-		WHERE  userid=#{userid}
-	]]>
+	<select id="findById" resultType="com.example.myapp.member.model.Member">
+		SELECT * FROM members WHERE id = #{id}
 	</select>
-	
-	<select id="selectAllMembers" resultType="com.example.myapp.member.model.Member">
-	<![CDATA[
-		SELECT userid, name, password, phone, address, role 
-		FROM   member
-	]]>
-	</select>
-	
-	<update id="updateMember" parameterType="com.example.myapp.member.model.Member">
-	<![CDATA[
-		UPDATE MEMBER
-		SET name=#{name}, password=#{password}, phone=#{phone}, email=#{email} 
-		WHERE userid=#{userid}
-	]]>
-	</update>
-	
-	<delete id="deleteMember" parameterType="com.example.myapp.member.model.Member">
-	<![CDATA[
-		DELETE FROM member 
-		WHERE userid=#{userid} AND password=#{password}
-	]]>
-	</delete>
 	
 	<select id="getPassword" parameterType="string" resultType="string">
-	<![CDATA[
-		SELECT password
-		FROM member
-		WHERE userid=#{userid}
-	]]>
+		<![CDATA[
+			SELECT password
+			FROM members
+			WHERE userid=#{userid}
+		]]>
 	</select>
 	
+	<select id="findByEmail" resultType="int">
+		SELECT COUNT(*) FROM members WHERE email = #{email}	
+	</select>
+	
+	<update id="setNewPw">
+		UPDATE members SET password = #{password} WHERE email = #{email}  		
+	</update>
+
+	<select id="getRoleById">
+		SELECT role FROM members WHERE id =#{id}	
+	</select>
+	
+	<update id="deleteMember">
+		UPDATE members SET deleted = 1 WHERE id =#{id}	
+	</update>
+
+	<select id="getMemberIdById" parameterType="string" resultType="long">
+		<![CDATA[
+			SELECT member_id
+			FROM members
+			WHERE id=#{memberId}
+		]]>
+	</select>
+	
+	<update id="resetEmail">
+		UPDATE members
+		(email) SET #{email}
+		WHERE member_id = #{memberUID}  
+	</update>
+
+	<select id="getAllMembers" resultType="com.example.myapp.member.model.MemberResponse">
+		<![CDATA[
+			SELECT member_id AS memberId, CONCAT(LEFT(phone, 4), '****', RIGHT(phone, 5)) AS phone, email, role, name
+			FROM members
+		]]>
+	</select>
+	
+	<delete id="forceDeleteMember">
+		<![CDATA[
+			DELETE
+			FROM members
+			WHERE member_id = ${memberId}
+		]]>
+	</delete>
+	
+	<delete id="deleteAllMembers">
+		<![CDATA[
+	        DELETE FROM members
+        	WHERE role <> 'admin'
+		]]>
+	</delete>
+
+	<select id="getIdByMemberId" resultType="string">
+		SELECT id
+		FROM members
+		WHERE member_id = #{memberId}
+	</select>
 </mapper>
