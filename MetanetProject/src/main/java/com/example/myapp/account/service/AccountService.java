@@ -45,7 +45,7 @@ public class AccountService implements IAccountService {
 
 		List<AccountLecture> result = null;
 		try {
-			String memberUID = memberRepository.getMemberIdById(memberId);
+			Long memberUID = memberRepository.getMemberIdById(memberId);
 			result = accountRepository.getLecture(memberUID);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -58,7 +58,7 @@ public class AccountService implements IAccountService {
 	@Override
 	public ResponseEntity<ResponseDto> insertCategory(String tags, String memberId) {
 
-		String memberUID = memberRepository.getMemberIdById(memberId);
+		Long memberUID = memberRepository.getMemberIdById(memberId);
 
 		String[] categories = tags.split(",");
 
@@ -77,7 +77,7 @@ public class AccountService implements IAccountService {
 
 	@Override
 	public ResponseEntity<ResponseDto> updateProfile(String user, MultipartFile file) {
-		String memberUID = memberRepository.getMemberIdById(user);
+		Long memberUID = memberRepository.getMemberIdById(user);
 		Long memberid = Long.valueOf(memberUID);
 
 		String fileUrl = s3FileUploader.uploadFile(file, "members", "profile", memberid);
@@ -95,7 +95,7 @@ public class AccountService implements IAccountService {
 
 	@Override
 	public ResponseEntity<ResponseDto> getMyPage(String user) {
-		String memberUID = memberRepository.getMemberIdById(user);
+		Long memberUID = memberRepository.getMemberIdById(user);
 		List<Members> result = null;
 
 		try {

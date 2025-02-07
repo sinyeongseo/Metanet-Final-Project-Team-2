@@ -16,13 +16,13 @@ import com.example.myapp.account.model.IngLecture;
 @Repository
 @Mapper
 public interface IAccountRepository {
-	List<AccountLecture> getLecture(String memberUID);	
+	List<AccountLecture> getLecture(Long memberUID);	
 
-	void insertCategory(String memberUID, String tagName);
+	void insertCategory(Long memberUID, String tagName);
 
-	void updateProfile(String memberUID, String fileUrl);
+	void updateProfile(Long memberUID, String fileUrl);
 
-	List<Members> getMyPage(String memberUID);
+	List<Members> getMyPage(Long memberUID);
 
 	List<AttendLecture> getAttendLecture(String memberUID);
 
