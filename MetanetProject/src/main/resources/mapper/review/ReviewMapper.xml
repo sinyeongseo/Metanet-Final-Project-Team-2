@@ -6,18 +6,29 @@
 
 	<insert id="registerReview" parameterType="com.example.myapp.review.model.Review" >
 	<![CDATA[
-        SELECT review_id, lecture_id, member_id, content, review_date, answer_id, deleted
-        FROM reviews
-        WHERE lecture_id = #{lectureId}
-        ORDER BY answer_id IS NULL DESC, answer_id ASC, review_date ASC
+        INSERT INTO reviews (lecture_id, member_id, content, answer_id)
+        VALUES ( #{lectureId} , #{memberId} , #{content} , #{answerId} )
     ]]>
 	</insert>
 
     <select id="getReviews" parameterType="Long" resultType="com.example.myapp.review.model.Review">
     <![CDATA[
-		SELECT review_id as reviewId, lecture_id as lectureId, member_id as memberId, content, review_date reviewDate, answer_id as answerId
-        FROM reviews
-        WHERE lecture_id = #{lectureId} AND deleted = 0
+    SELECT 
+        l.review_id as reviewId, 
+        l.lecture_id as lectureId, 
+        l.member_id as memberId, 
+        k.profile, 
+        l.content, 
+        l.review_date as reviewDate, 
+        l.answer_id as answerId
+    FROM reviews l
+    JOIN members k ON l.member_id = k.member_id
+    LEFT JOIN reviews p ON l.answer_id = p.review_id
+    WHERE l.deleted = 0 AND l.lecture_id = #{lectureId}
+    ORDER BY
+        COALESCE(p.review_date, l.review_date) DESC,
+        CASE WHEN l.answer_id IS NULL THEN 0 ELSE 1 END,
+        l.review_date ASC
 	]]>
     </select>
 
