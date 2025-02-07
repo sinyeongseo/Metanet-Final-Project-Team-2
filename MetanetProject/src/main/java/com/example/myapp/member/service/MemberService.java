@@ -308,7 +308,7 @@ public class MemberService implements IMemberService {
 
 	@Override
 	public ResponseEntity<ResponseDto> resetEmail(String user, String email) {
-		String memberUID = memberRepository.getMemberIdById(user);
+		Long memberUID = memberRepository.getMemberIdById(user);
 		
 		try {
 			memberRepository.resetEmail(email, memberUID);
