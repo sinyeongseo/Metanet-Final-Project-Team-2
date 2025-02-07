@@ -38,4 +38,6 @@ public interface IMemberService {
 	boolean checkRefreshTokenValidity(String refreshToken);
 
 	boolean deleteMemberByToken(String refreshToken);
+
+	ResponseEntity<ResponseDto> resetEmail(String user, String email);
 }

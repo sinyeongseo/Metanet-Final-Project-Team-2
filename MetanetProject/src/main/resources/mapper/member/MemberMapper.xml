@@ -48,4 +48,11 @@
 		WHERE id=#{memberId}
 	]]>
 	</select>
+	
+	
+	<update id="resetEmail">
+		UPDATE members
+		(email) SET #{email}
+		WHERE member_id = #{memberUID}  
+	</update>
 </mapper>

@@ -51,20 +51,20 @@ public class MemberService implements IMemberService {
 	private final RedisTokenService redisTokenService;
 
 	@Autowired
-	IMemberRepository memberDao;
+	IMemberRepository memberRepository;
 
 	@Autowired
 	JwtTokenProvider jwtProvider;
 
 	@Override
 	public void insertMember(Member member) {
-		memberDao.insertMember(member);
+		memberRepository.insertMember(member);
 	}
 
 	// id 값으로 member 객체 여부 확인
 	@Override
 	public Optional<Member> findById(String id) {
-		return memberDao.findById(id);
+		return memberRepository.findById(id);
 	}
 
 	private String createCode() {
@@ -106,6 +106,8 @@ public class MemberService implements IMemberService {
 			message.setSubject("[Metanet] 회원가입 이메일 인증번호입니다.");
 		} else if (type.equals("password")) {
 			message.setSubject("[Metanet] 비밀번호 재발급 인증번호입니다.");
+		} else if (type.equals("password")) {
+			message.setSubject("[Metanet] 이메일 수정 인증번호입니다.");
 		}
 
 		message.setFrom(senderEmail);
@@ -188,7 +190,7 @@ public class MemberService implements IMemberService {
 	@Override
 	public boolean findByEmail(String email) {
 		// 메일이 없는 경우 오류
-		if (memberDao.findByEmail(email) != 1) {
+		if (memberRepository.findByEmail(email) != 1) {
 			return false;
 		}
 		return true;
@@ -197,7 +199,7 @@ public class MemberService implements IMemberService {
 	@Override
 	public void resetPw(String email, String password) {
 
-		memberDao.setNewPw(email, password);
+		memberRepository.setNewPw(email, password);
 	}
 
 	@Override
@@ -238,8 +240,8 @@ public class MemberService implements IMemberService {
 	@Override
 	public boolean revokeRefreshToken(String refreshToken) {
 		try {
-			
-			String docoderesult = jwtProvider.decodeRefreshToken(refreshToken);			
+
+			String docoderesult = jwtProvider.decodeRefreshToken(refreshToken);
 			redisTokenService.existsRefreshToken(docoderesult);
 
 			return true;
@@ -251,11 +253,11 @@ public class MemberService implements IMemberService {
 	@Override
 	public boolean deleteMemberByToken(String refreshToken) {
 		try {
-			//refresh token 디코드
+			// refresh token 디코드
 			String docoderesult = jwtProvider.decodeRefreshToken(refreshToken);
-			memberDao.deleteMember(docoderesult);
+			memberRepository.deleteMember(docoderesult);
 			redisTokenService.deleteRefreshToken(docoderesult);
-			
+
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -264,10 +266,26 @@ public class MemberService implements IMemberService {
 
 	@Override
 	public boolean checkRefreshTokenValidity(String refreshToken) {
-		//refresh token 디코드
+		// refresh token 디코드
 		String docoderesult = jwtProvider.decodeRefreshToken(refreshToken);
-		//회원 ID에 따른 토큰 존재하는지 확인 후 결과 값 반환
+		// 회원 ID에 따른 토큰 존재하는지 확인 후 결과 값 반환
 		return redisTokenService.existsRefreshToken(docoderesult);
+
+	}
+
+	@Override
+	public ResponseEntity<ResponseDto> resetEmail(String user, String email) {
+		String memberUID = memberRepository.getMemberIdById(user);
+		
+		try {
+			memberRepository.resetEmail(email, memberUID);
+		}catch(Exception e) {
+			e.printStackTrace();
+	        return ResponseDto.databaseError();
+		}
+		
+		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+		return ResponseEntity.ok(responseBody);
 
 	}
 }

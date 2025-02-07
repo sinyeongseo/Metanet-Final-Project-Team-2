@@ -28,4 +28,7 @@ public interface IMemberRepository {
 	void deleteMember(String id);
 
 	String getMemberIdById(String memberId);
+	
+	void resetEmail(String email, String memberUID);
+	
 }
