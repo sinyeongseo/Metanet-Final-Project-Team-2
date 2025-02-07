@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends GenericFilterBean {
-   private final JwtTokenProvider jwtTokenProvider;
+private final JwtTokenProvider jwtTokenProvider;
    private final AntPathMatcher pathMatcher = new AntPathMatcher();
    public final static List<String> ACCEPTED_URL_LIST = List.of("/auth/join", "/auth/login", "/auth/password",
            "/auth/re-access-token", "/auth/delete","/email/send", "/email/verify", "/email/mail-password",

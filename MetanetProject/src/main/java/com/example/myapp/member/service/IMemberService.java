@@ -14,6 +14,8 @@ public interface IMemberService {
 	// 인증 코드 이메일 발송
 	ResponseEntity<ResponseDto> sendEmail(String type, String email) throws MessagingException;
 
+	ResponseEntity<ResponseDto> sendEmail(String type, String email, Object data) throws MessagingException;
+	
 	// 코드 검증
 	ResponseEntity<ResponseDto> verifyEmailCode(String email, String code);
 
@@ -38,4 +40,6 @@ public interface IMemberService {
 	boolean checkRefreshTokenValidity(String refreshToken);
 
 	boolean deleteMemberByToken(String refreshToken);
+
+	ResponseEntity<ResponseDto> resetEmail(String user, String email);
 }
